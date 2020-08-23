@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>403</width>
-    <height>448</height>
+    <width>452</width>
+    <height>447</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,77 +26,6 @@
     <string>Autostart</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>13</y>
-     <width>47</width>
-     <height>13</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Directory:</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="saveButton">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>40</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="layoutDirection">
-    <enum>Qt::LeftToRight</enum>
-   </property>
-   <property name="text">
-    <string>Save</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="directoryEdit">
-   <property name="geometry">
-    <rect>
-     <x>70</x>
-     <y>10</y>
-     <width>251</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>C:\Photos</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="browseButton">
-   <property name="geometry">
-    <rect>
-     <x>330</x>
-     <y>10</y>
-     <width>51</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Browse</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="loadButton">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>70</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="layoutDirection">
-    <enum>Qt::LeftToRight</enum>
-   </property>
-   <property name="text">
-    <string>Load</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
@@ -113,123 +42,373 @@
     <string>Start</string>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBox">
+  <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>170</y>
-     <width>371</width>
-     <height>221</height>
+     <y>120</y>
+     <width>431</width>
+     <height>281</height>
     </rect>
    </property>
-   <property name="title">
-    <string>Printer Settings</string>
+   <property name="tabShape">
+    <enum>QTabWidget::Triangular</enum>
    </property>
-   <widget class="QPushButton" name="printerSelectButton">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>81</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Config Printer</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>60</y>
-      <width>47</width>
-      <height>13</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Printer:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="PrinterNameEdit">
-    <property name="geometry">
-     <rect>
-      <x>72</x>
-      <y>55</y>
-      <width>261</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PrinterName</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QGroupBox" name="groupBox_2">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>80</y>
-      <width>161</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Orientation</string>
-    </property>
-    <widget class="QRadioButton" name="landscapeRadioButton">
-     <property name="enabled">
-      <bool>true</bool>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="PrinterSettingsTab">
+    <attribute name="title">
+     <string>Printer Settings</string>
+    </attribute>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>161</width>
+       <height>51</height>
+      </rect>
      </property>
+     <property name="title">
+      <string>Orientation</string>
+     </property>
+     <widget class="QRadioButton" name="landscapeRadioButton">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>82</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Landscape</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="PortraitRadioButton">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>20</y>
+        <width>82</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Portrait</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QPushButton" name="printerSelectButton">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>82</width>
-       <height>17</height>
+       <width>81</width>
+       <height>23</height>
       </rect>
      </property>
      <property name="text">
-      <string>Landscape</string>
+      <string>Config Printer</string>
      </property>
-     <property name="checkable">
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Printer:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="PrinterNameEdit">
+     <property name="geometry">
+      <rect>
+       <x>62</x>
+       <y>55</y>
+       <width>261</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>PrinterName</string>
+     </property>
+     <property name="readOnly">
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QRadioButton" name="PortraitRadioButton">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
+    <widget class="QTextEdit" name="printerTextEdit">
      <property name="geometry">
       <rect>
-       <x>90</x>
-       <y>20</y>
-       <width>82</width>
-       <height>17</height>
+       <x>10</x>
+       <y>160</y>
+       <width>311</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>140</y>
+       <width>47</width>
+       <height>13</height>
       </rect>
      </property>
      <property name="text">
-      <string>Portrait</string>
+      <string>Status:</string>
      </property>
-     <property name="checkable">
-      <bool>true</bool>
+    </widget>
+    <widget class="QCheckBox" name="externalPrintCheckBox">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>20</y>
+       <width>141</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use the external print script specified in the &amp;quot;Scripts&amp;quot; tab. If checked, normal printing is disabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Use External Print Script</string>
      </property>
     </widget>
    </widget>
-   <widget class="QTextEdit" name="printerTextEdit">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>140</y>
-      <width>311</width>
-      <height>71</height>
-     </rect>
+   <widget class="QWidget" name="ScriptsTab">
+    <property name="enabled">
+     <bool>false</bool>
     </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
+    <attribute name="title">
+     <string>Scripts</string>
+    </attribute>
+    <widget class="QWidget" name="gridLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>411</width>
+       <height>141</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="directoryEdit_6">
+        <property name="text">
+         <string>img-closed.bat</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;if configured: This script will be executed before a print is started&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Pre Print</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>External Print</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="browseButton_4">
+        <property name="text">
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QPushButton" name="browseButton_5">
+        <property name="text">
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Img maximized</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="browseButton_2">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Browse for Script&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="directoryEdit_5">
+        <property name="text">
+         <string>img-maximized.bat</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Img closed</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="browseButton_3">
+        <property name="text">
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="directoryEdit_4">
+        <property name="text">
+         <string>postprint.bat</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="QPushButton" name="browseButton_6">
+        <property name="text">
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="directoryEdit_3">
+        <property name="text">
+         <string>externalprint.bat</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="directoryEdit_2">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;if configured: This script will be executed before a print is started&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>preprint.bat</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Post Print</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_3">
+    <attribute name="title">
+     <string>Thumbnail view</string>
+    </attribute>
+    <widget class="QLabel" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Thumbnail size</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>111</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Scroll to newest after </string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>50</y>
+       <width>61</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>50</y>
+       <width>47</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>seconds</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBox_2">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>20</y>
+       <width>61</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>100</number>
+     </property>
+     <property name="maximum">
+      <number>1000</number>
+     </property>
+     <property name="value">
+      <number>200</number>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox_3">
@@ -238,13 +417,16 @@
      <x>10</x>
      <y>40</y>
      <width>120</width>
-     <height>121</height>
+     <height>61</height>
     </rect>
    </property>
    <property name="title">
     <string>Misc</string>
    </property>
    <widget class="QCheckBox" name="fullScreenCheckBox">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -271,13 +453,45 @@
     </property>
    </widget>
   </widget>
+  <widget class="QPushButton" name="loadButton">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>73</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="text">
+    <string>Load</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="saveButton">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>53</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </widget>
   <widget class="QGroupBox" name="groupBox_4">
    <property name="geometry">
     <rect>
      <x>140</x>
      <y>40</y>
      <width>161</width>
-     <height>121</height>
+     <height>61</height>
     </rect>
    </property>
    <property name="title">
@@ -312,6 +526,39 @@
      <string>Enable shopping Cart</string>
     </property>
    </widget>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>0</y>
+     <width>431</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Directory:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="directoryEdit">
+      <property name="text">
+       <string>C:\Photos</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="browseButton">
+      <property name="text">
+       <string>Browse</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>

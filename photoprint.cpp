@@ -154,6 +154,9 @@ void PhotoPrint::set_View(ViewEnum e){
         imgView->hide();
         ui->printButton->hide();
         ui->cartButton->hide();
+
+        configWidget->script_setViewThumbnails(); // execute the external script
+
         currentView = viewThumbnails;
         break;
     case viewImage:
@@ -168,9 +171,14 @@ void PhotoPrint::set_View(ViewEnum e){
             ui->printButton->hide();
         }
         ui->cartButton->setVisible(configWidget->get_shoppingCartEnable());
+
+        configWidget->script_setViewImage(selectedImageItem->filename); // execute the external script
+
         currentView = viewImage;
         break;
     case viewCart:
+        configWidget->script_setViewCart(); // execute the external script
+
         currentView = viewCart;
         break;
     default:
@@ -305,21 +313,34 @@ void PhotoPrint::on_printButton_clicked()
 {
     if(selectedImageItem != NULL)
     {
-        QImage img = selectedImageItem->getImage();
-        QPrinter* printer = configWidget->get_Printer();
+        configWidget->script_prePrint(selectedImageItem->filename );
+        if(configWidget->get_externalPrintEnable())
+        {
+            // start this script blocking.. or maybe not?
+            configWidget->script_externalPrint(selectedImageItem->filename );
+        }
+        else
+        {
+            QImage img = selectedImageItem->getImage();
+            QPrinter* printer = configWidget->get_Printer();
+            qDebug() << "printer state" << printer->printerState();
+            QPainter painter(printer);
+            double xscale = printer->pageRect().width() / double(img.width());
+            double yscale = printer->pageRect().height() / double(img.height());
+            double scale = qMin(xscale, yscale);
+            qDebug() << "pageRect().width " << printer->pageRect().width();
+            qDebug() << "img.width " << img.width();
+            qDebug() << "scale " << scale;
+            //painter.translate(printer->paperRect().x() + printer->pageRect().width() / 2,
+            //                    printer->paperRect().y() + printer->pageRect().height() / 2);
+            painter.scale(scale, scale);
+            //painter.translate(-width() / 2, -height() / 2);
+            painter.drawImage(QPoint(0,0),img);
+            painter.end();
 
-        QPainter painter(printer);
-        double xscale = printer->pageRect().width() / double(img.width());
-        double yscale = printer->pageRect().height() / double(img.height());
-        double scale = qMin(xscale, yscale);
-        qDebug() << "pageRect().width " << printer->pageRect().width();
-        qDebug() << "img.width " << img.width();
-        qDebug() << "scale " << scale;
-        //painter.translate(printer->paperRect().x() + printer->pageRect().width() / 2,
-        //                    printer->paperRect().y() + printer->pageRect().height() / 2);
-        painter.scale(scale, scale);
-        //painter.translate(-width() / 2, -height() / 2);
-        painter.drawImage(QPoint(0,0),img);
-        painter.end();
+            qDebug() << "printer state" << printer->printerState();
+            qDebug() << "printer state" << printer->printerState();
+        }
+
     }
 }

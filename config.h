@@ -10,6 +10,9 @@ namespace Ui {
 class config;
 }
 
+
+
+
 class config : public QWidget
 {
     Q_OBJECT
@@ -24,6 +27,15 @@ public:
     bool get_singlePrintEnable();
     bool get_shoppingCartEnable();
     bool get_autostart();
+
+
+    bool get_externalPrintEnable();
+
+    bool script_prePrint(QString filename, bool blocking=false);
+    bool script_externalPrint(QString filename, bool blocking=true);
+    bool script_setViewImage(QString filename, bool blocking=false);
+    bool script_setViewThumbnails(bool blocking=false);
+    bool script_setViewCart(bool blocking=false);
 
 private slots:
     void on_saveButton_clicked();
@@ -50,7 +62,8 @@ private:
     QPrinter *printer;
     void setPrinterUi();
 
-
+    // External Script
+    bool executeExternal(QString filename, QStringList arguments, bool blocking );
 
 signals:
     void StartButton_clicked();

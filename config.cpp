@@ -26,6 +26,7 @@ config::config(QWidget *parent) :
     SetReadOnly(ui->landscapeRadioButton, true);
     SetReadOnly(ui->landscapeRadioButton, true);
 
+
 }
 
 config::~config()
@@ -169,6 +170,13 @@ bool config::get_cutHeight()
 
 void config::on_printerSelectButton_clicked()
 {
+    QList<QPrinterInfo> plist = QPrinterInfo::availablePrinters();
+    qDebug() << "number of printers: " << plist.length();
+
+    foreach( QPrinterInfo pinfo , plist){
+        qDebug() << "printer name: " << pinfo.printerName();
+    }
+    qDebug() << "printer->printerName: " << printer->printerName();
     QPrintDialog dialog(printer, this);
     dialog.setWindowTitle(tr("Print Document"));
     //if (editor->textCursor().hasSelection())
@@ -256,3 +264,100 @@ bool config::get_autostart()
 {
     return ui->AutostartCheckBox->isChecked();
 }
+
+bool config::get_externalPrintEnable()
+{
+    return ui->externalPrintCheckBox->isChecked();
+}
+
+//// ------------------- Script thingies ---------------
+///
+///
+///
+///
+///
+
+bool config::script_prePrint(QString filename, bool blocking)
+{
+    QString command("prePrint.bat");
+
+    QStringList sl;
+    sl.append(filename);
+
+    return executeExternal(command, sl, blocking);
+}
+
+bool config::script_externalPrint( QString filename, bool blocking)
+{
+    QString command("externalPrint.bat");
+
+    QStringList sl;
+    sl.append(filename);
+
+    return executeExternal(command, sl, blocking);
+}
+
+bool config::script_setViewImage(QString filename, bool blocking)
+{
+    QString command("setViewImage.bat");
+
+    QStringList sl;
+    sl.append(filename);
+
+    return executeExternal(command, sl, blocking);
+}
+
+bool config::script_setViewThumbnails(bool blocking)
+{
+    QString command("setViewThumbnails.bat");
+
+    QStringList sl;
+
+    return executeExternal(command, sl, blocking);
+}
+
+bool config::script_setViewCart(bool blocking)
+{
+    QString command("setViewCart.bat");
+
+    QStringList sl;
+
+    return executeExternal(command, sl, blocking);
+}
+
+bool config::executeExternal(QString filename, QStringList arguments, bool blocking )
+{
+    qDebug() << "trying to execute: " << filename;
+    qDebug() << "with arguments: " << arguments;
+    if(blocking)
+    {
+        qDebug() << "blocking";
+        int ret = QProcess::execute(filename, arguments);
+
+        switch(ret)
+        {
+        case (-2):
+            qDebug() << "process could not be startet";
+            return false;
+            break;
+        case (-1):
+            qDebug() << "process crashed";
+            return false;
+            break;
+        default:
+            return true;
+        }
+    }
+    else
+    {
+        qDebug() << "no blocking";
+        bool ret = QProcess::startDetached(filename, arguments);
+        qDebug() << "ret = " << ret;
+        return ret;
+    }
+
+    // should not get here?
+    return false;
+}
+
+
