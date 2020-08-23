@@ -8,7 +8,7 @@ class ImageItem : public QObject, public QListWidgetItem
 {
     Q_OBJECT
 public:
-    explicit ImageItem(QString filename, QObject *parent = nullptr);
+    explicit ImageItem(QString filename, QSize ThumbnailSize=QSize(200,200), QObject *parent = nullptr);
     ~ImageItem();
     QString         filename;
     //QListWidgetItem *listWidgetItem;
@@ -23,6 +23,7 @@ public slots:
 private:
     QString bla;
     QObject *parent;
+    QSize ThumbnailSize;
 
 signals:
 

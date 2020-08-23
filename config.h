@@ -27,7 +27,7 @@ public:
     bool get_singlePrintEnable();
     bool get_shoppingCartEnable();
     bool get_autostart();
-
+    QSize get_ThumbnailSize();
 
     bool get_externalPrintEnable();
 

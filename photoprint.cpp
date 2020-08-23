@@ -122,7 +122,7 @@ bool PhotoPrint::checkForNewImages(QString path)
         if(!imageMap.contains(tmp))
         {
             ImageItem *it;
-            it = new ImageItem(tmp);
+            it = new ImageItem(tmp, configWidget->get_ThumbnailSize());
             ret = true;
 
             // insert into image map:
@@ -214,6 +214,7 @@ void PhotoPrint::on_pushButton_clicked()
 
 void PhotoPrint::start()
 {
+    ui->listWidget->setIconSize(configWidget->get_ThumbnailSize());
     set_View(viewThumbnails);
 
     imgView->cutHeight = configWidget->get_cutHeight();

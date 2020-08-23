@@ -4,10 +4,11 @@
 #include "imagescalerunner.h"
 #include <QThreadPool>
 
-ImageItem::ImageItem(QString filename, QObject *parent) :QObject(parent), QListWidgetItem()
+ImageItem::ImageItem(QString filename,  QSize ThumbnailSize, QObject *parent) :QObject(parent), QListWidgetItem()
 {
     this->parent = parent;
     this->filename = filename;
+    this->ThumbnailSize = ThumbnailSize;
 
     // read the image and scale:
     //QImageReader reader(filename);
@@ -23,7 +24,7 @@ ImageItem::ImageItem(QString filename, QObject *parent) :QObject(parent), QListW
     //instead do this threaded to improve loading:
 
     // threaded loading:
-    ImageScaleRunner *runner = new ImageScaleRunner(filename, QSize(200,200));  // do not set parent of runner thread as emit will fail
+    ImageScaleRunner *runner = new ImageScaleRunner(filename, this->ThumbnailSize);  // do not set parent of runner thread as emit will fail
     QObject::connect(runner, SIGNAL(finished(QString, QImage)), this, SLOT(thumbnailLoaded(QString, QImage)),Qt::QueuedConnection);
     QThreadPool::globalInstance()->start(runner);
 

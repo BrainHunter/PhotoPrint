@@ -86,6 +86,10 @@ void config::loadSettings()
 
      // Printer things:
      QString printerName = settings.value("Printer/PrinterName",QPrinterInfo::defaultPrinterName()).toString();
+     if(printerName == "")
+     {
+         printerName = QPrinterInfo::defaultPrinterName();
+     }
 
      printer->setPrinterName(printerName);
      int printerOrientation = settings.value("Printer/PrinterOrrientation").toInt();
@@ -99,6 +103,13 @@ void config::loadSettings()
          break;
      default:
          printer->setOrientation(QPrinter::Portrait);
+     }
+
+     //thumbnail view settings:
+     uint ThumbnailSize = settings.value("ThumbnailView/ThumbnailSize", "200").toUInt();
+     if (ui->thumbnailSizeSpinBox)
+     {
+        ui->thumbnailSizeSpinBox->setValue(ThumbnailSize);
      }
 
      // update ui
@@ -130,9 +141,10 @@ void config::saveSettings()
 
      settings.endGroup();
 
-
-
-
+     //thumbnail view settings:
+     settings.beginGroup("ThumbnailView");
+     settings.setValue("ThumbnailSize", ui->thumbnailSizeSpinBox->value());
+     settings.endGroup();
 }
 
 void config::on_saveButton_clicked()
@@ -361,3 +373,15 @@ bool config::executeExternal(QString filename, QStringList arguments, bool block
 }
 
 
+
+//// ------------------- Thumbnail View thingies ---------------
+///
+///
+///
+///
+///
+QSize config::get_ThumbnailSize()
+{
+
+    return QSize(ui->thumbnailSizeSpinBox->value(), ui->thumbnailSizeSpinBox->value());
+}
