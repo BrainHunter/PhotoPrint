@@ -10,6 +10,17 @@ ImageItem::ImageItem(QString filename,  QSize ThumbnailSize, QObject *parent) :Q
     this->filename = filename;
     this->ThumbnailSize = ThumbnailSize;
 
+
+    // change font size to 1 -> minimize the gap between the Items
+    QFont f = this->font();
+    f.setPointSizeF(0.01);
+    this->setFont(f);
+
+    // set text color to transparent --> invisible
+    setForeground(Qt::transparent);
+
+
+
     // read the image and scale:
     //QImageReader reader(filename);
     //QStringList sl = reader.textKeys();
@@ -55,6 +66,6 @@ void ImageItem::thumbnailLoaded(QString file, QImage img)
         qDebug() << "file != filename"  << file << " != " << filename ;
     icon =  QIcon(QPixmap::fromImage(img));
     this->setIcon(icon);
-    // show filename:
-    //this->setText(this->filename);
+    // set filename as text, this helps sorting the images. the text is hidden, see constructor
+    this->setText(this->filename);
 }
