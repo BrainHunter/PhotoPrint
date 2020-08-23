@@ -105,6 +105,12 @@ void config::loadSettings()
          printer->setOrientation(QPrinter::Portrait);
      }
 
+     uint printActiveTimeout = settings.value("PrintActiveTimeout", "5").toUInt();
+     if (ui->printActiveTimeoutSpinBox)
+     {
+        ui->printActiveTimeoutSpinBox->setValue(printActiveTimeout);
+     }
+
      //thumbnail view settings:
      uint ThumbnailSize = settings.value("ThumbnailView/ThumbnailSize", "200").toUInt();
      if (ui->thumbnailSizeSpinBox)
@@ -138,8 +144,8 @@ void config::saveSettings()
      settings.beginGroup("Printer");
      settings.setValue("PrinterName", printer->printerName());
      settings.setValue("PrinterOrientation",printer->orientation());
-
-     settings.endGroup();
+     settings.endGroup();     
+     settings.setValue("PrintActiveTimeout",ui->printActiveTimeoutSpinBox->value());
 
      //thumbnail view settings:
      settings.beginGroup("ThumbnailView");
@@ -277,6 +283,11 @@ bool config::get_autostart()
     return ui->AutostartCheckBox->isChecked();
 }
 
+bool config::get_showFullscreen()
+{
+    return ui->fullScreenCheckBox->isChecked();
+}
+
 bool config::get_externalPrintEnable()
 {
     return ui->externalPrintCheckBox->isChecked();
@@ -370,6 +381,12 @@ bool config::executeExternal(QString filename, QStringList arguments, bool block
 
     // should not get here?
     return false;
+}
+
+uint config::get_printActiveTimeout()
+{
+    return ui->printActiveTimeoutSpinBox->value();
+
 }
 
 

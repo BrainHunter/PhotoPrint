@@ -6,6 +6,8 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     , ui(new Ui::PhotoPrint)
     , configWidget(new config)
     , imgView(new ImageView(this))
+    , printActiveView(new ImageView(this))
+    , printActiveTimer(new QTimer(this))
 {
     ui->setupUi(this);
 
@@ -51,6 +53,13 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     // Image View;
     imgView->hide();
     connect(imgView, SIGNAL(Mouse_pressed()), this, SLOT(on_imageView_Pressed()));
+
+    // print Active view
+    printActiveView->hide();
+    printActiveView->setImage(QImage("icons/printActive.png"));
+    // print Active timer:
+    printActiveTimer->setSingleShot(true);
+    connect(printActiveTimer,SIGNAL(timeout()),this,SLOT(printActiveTimerTimeout()));
 
 
     // File System checker
@@ -141,9 +150,12 @@ void PhotoPrint::set_View(ViewEnum e){
     switch(e)
     {
     case viewConfig:
+        this->showNormal();
+        this->unsetCursor();
         configWidget->show();
         ui->listWidget->hide();
         imgView->hide();
+        printActiveView->hide();
         ui->printButton->hide();
         ui->cartButton->hide();
         currentView = viewConfig;
@@ -152,6 +164,7 @@ void PhotoPrint::set_View(ViewEnum e){
         configWidget->hide();
         ui->listWidget->show();
         imgView->hide();
+        printActiveView->hide();
         ui->printButton->hide();
         ui->cartButton->hide();
 
@@ -161,6 +174,7 @@ void PhotoPrint::set_View(ViewEnum e){
         break;
     case viewImage:
         imgView->show();
+        printActiveView->hide();
         ui->listWidget->hide();
         configWidget->hide();
         if(configWidget->get_singlePrintEnable())
@@ -178,8 +192,21 @@ void PhotoPrint::set_View(ViewEnum e){
         break;
     case viewCart:
         configWidget->script_setViewCart(); // execute the external script
-
+        printActiveView->hide();
         currentView = viewCart;
+        break;
+    case viewPrintActive:
+        printActiveViewMarker = currentView;
+        printActiveView->show();
+        printActiveView->resize(this->size());
+        printActiveView->raise();
+
+        ui->printButton->hide();
+        ui->cartButton->hide();
+
+        // start the printActiveTimer which restores the old view once timed out
+        printActiveTimer->start(5000);
+        currentView = viewPrintActive;
         break;
     default:
        break;
@@ -223,6 +250,13 @@ void PhotoPrint::start()
 
     // hide the pushbutton:
     ui->pushButton->hide();
+
+    if(configWidget->get_showFullscreen())
+    {
+        this->showFullScreen();
+        //this->setCursor(Qt::BlankCursor);
+    }
+
 
     watcher->addPath(configWidget->get_Image_Path());
 
@@ -299,12 +333,19 @@ void PhotoPrint::resizeEvent(QResizeEvent *event)
     //                       tr("Size: %1 x %2")
     //                       .arg(event->size().width()).arg(event->size().height()));
 
+    //qDebug() << "width: " << event->size().width() << " height: " << event->size().height();
+    //qDebug() << "width: " << this->size().width() << " height: " << this->size().height();
+    // there is a bug (maybe a feature) as the size returned by the event is not the final size
+    // of the window when going into fullscreen. hence the size returned by this->size() is correct
+    // it is easy to use this size.
+
+
     // resize list widget:
-    ui->listWidget->setGeometry(0,0,event->size().width(),event->size().height() );
+    ui->listWidget->setGeometry(0,0,this->size().width(),this->size().height() );
     ui->listWidget->sortItems();
 
     // resize the image view
-    imgView->resize(event->size());
+    imgView->resize(this->size());
 
     // call the resize event of the base class
     QWidget::resizeEvent(event);
@@ -315,6 +356,9 @@ void PhotoPrint::on_printButton_clicked()
     if(selectedImageItem != NULL)
     {
         configWidget->script_prePrint(selectedImageItem->filename );
+        // display the "printing dialog for the user."
+        set_View(viewPrintActive);
+
         if(configWidget->get_externalPrintEnable())
         {
             // start this script blocking.. or maybe not?
@@ -344,4 +388,11 @@ void PhotoPrint::on_printButton_clicked()
         }
 
     }
+}
+
+void PhotoPrint::printActiveTimerTimeout()
+{
+    // print active timer timed out.
+    // restore the old view.
+    set_View(printActiveViewMarker);
 }

@@ -55,4 +55,6 @@ void ImageItem::thumbnailLoaded(QString file, QImage img)
         qDebug() << "file != filename"  << file << " != " << filename ;
     icon =  QIcon(QPixmap::fromImage(img));
     this->setIcon(icon);
+    // show filename:
+    //this->setText(this->filename);
 }

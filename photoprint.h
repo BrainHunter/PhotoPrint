@@ -29,7 +29,8 @@ public:
             viewConfig,
             viewThumbnails,
             viewImage,
-            viewCart
+            viewCart,
+            viewPrintActive
     };
 
 private slots:
@@ -46,6 +47,8 @@ private slots:
 
     void on_printButton_clicked();
 
+    void printActiveTimerTimeout();
+
 private:
     Ui::PhotoPrint *ui;
 
@@ -53,6 +56,7 @@ private:
     config *configWidget;
     void set_View(ViewEnum);
     ImageView *imgView;
+    ImageView *printActiveView;
 
     // control vars:
     ViewEnum currentView;
@@ -65,6 +69,10 @@ private:
 
     bool checkForNewImages(QString path);
     QFileSystemWatcher* watcher;
+
+    //Timer for Printactive message
+    QTimer* printActiveTimer;
+    ViewEnum printActiveViewMarker;
 
 };
 #endif // PHOTOPRINT_H
