@@ -49,6 +49,8 @@ private slots:
 
     void printActiveTimerTimeout();
 
+    void on_backButton_clicked();
+
 private:
     Ui::PhotoPrint *ui;
 

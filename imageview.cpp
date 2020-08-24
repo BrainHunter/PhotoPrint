@@ -49,9 +49,8 @@ ImageView::ImageView(QWidget *parent):
     this->setWidgetResizable(true);
     this->setFrameShape(QFrame::NoFrame); // this removes the white border!
 
+
     cutHeight=false;
-
-
 
 }
 

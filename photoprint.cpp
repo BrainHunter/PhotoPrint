@@ -27,6 +27,10 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     // make this list widget as big as the window is
     ui->listWidget->setGeometry(0,0,this->size().width(),this->size().height() );
 
+    // list widget background color:
+    ui->listWidget->setStyleSheet("QListWidget{ background: black; } ");
+
+
     // scrolling thingy
     QScrollerProperties sp;
     sp.setScrollMetric(QScrollerProperties::DragVelocitySmoothingFactor, 0.6);
@@ -72,7 +76,7 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     if(QFile::exists("icons/print.png"))
     {
         ui->printButton->setIcon(QIcon("icons/print.png"));
-        ui->printButton->setIconSize(QSize(40,40));
+        ui->printButton->setIconSize(QSize(100,100));
         ui->printButton->setText("");
     }
     else
@@ -84,7 +88,7 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     if(QFile::exists("icons/cart.png"))
     {
         ui->cartButton->setIcon(QIcon("icons/cart.png"));
-        ui->cartButton->setIconSize(QSize(40,40));
+        ui->cartButton->setIconSize(QSize(100,100));
         ui->cartButton->setText("");
     }
     else
@@ -92,6 +96,18 @@ PhotoPrint::PhotoPrint(QWidget *parent)
         ui->cartButton->setText("TO CART");
     }
 
+    // ---- backButton ----
+    ui->backButton->hide();
+    if(QFile::exists("icons/back.png"))
+    {
+        ui->backButton->setIcon(QIcon("icons/back.png"));
+        ui->backButton->setIconSize(QSize(100,100));
+        ui->backButton->setText("");
+    }
+    else
+    {
+        ui->backButton->setText("Back");
+    }
 
     // set default view:
     set_View(viewConfig);
@@ -150,14 +166,19 @@ void PhotoPrint::set_View(ViewEnum e){
     switch(e)
     {
     case viewConfig:
+        // return from fullsize
         this->showNormal();
+        // restore normal cursor
         this->unsetCursor();
+        // set normal color palette
+        this->setPalette(this->style()->standardPalette());
         configWidget->show();
         ui->listWidget->hide();
         imgView->hide();
         printActiveView->hide();
         ui->printButton->hide();
         ui->cartButton->hide();
+        ui->backButton->hide();
         currentView = viewConfig;
         break;
     case viewThumbnails:
@@ -167,6 +188,7 @@ void PhotoPrint::set_View(ViewEnum e){
         printActiveView->hide();
         ui->printButton->hide();
         ui->cartButton->hide();
+        ui->backButton->hide();
 
         configWidget->script_setViewThumbnails(); // execute the external script
 
@@ -185,6 +207,7 @@ void PhotoPrint::set_View(ViewEnum e){
             ui->printButton->hide();
         }
         ui->cartButton->setVisible(configWidget->get_shoppingCartEnable());
+        ui->backButton->show();
 
         configWidget->script_setViewImage(selectedImageItem->filename); // execute the external script
 
@@ -217,14 +240,19 @@ void PhotoPrint::set_View(ViewEnum e){
     int by = 20;     // top
     if(ui->printButton->isVisible())
     {
-        ui->printButton->setGeometry(bx, by, 50,50);
-        by = by + 20 +50; // next button is further down
+        ui->printButton->setGeometry(bx, by, 120,120);
+        by = by + 20 +120; // next button is further down
     }
     if(ui->cartButton->isVisible())
     {
-        ui->cartButton->setGeometry(bx, by, 50,50);
-        by = by + 20 +50; // next button is further down
+        ui->cartButton->setGeometry(bx, by, 120,120);
+        by = by + 20 + 120; // next button is further down
     }
+
+    bx = this->size().width() - 20 - 120;
+    by = 20;
+    ui->backButton->setGeometry(bx,by,120,120);
+
 
 }
 
@@ -241,6 +269,12 @@ void PhotoPrint::on_pushButton_clicked()
 
 void PhotoPrint::start()
 {
+
+    // Set the Background of the widget to black
+    QPalette pal;
+    pal.setColor(QPalette::Background, Qt::black);
+    this->setPalette(pal);
+
     ui->listWidget->setIconSize(configWidget->get_ThumbnailSize());
     set_View(viewThumbnails);
 
@@ -256,7 +290,6 @@ void PhotoPrint::start()
         this->showFullScreen();
         //this->setCursor(Qt::BlankCursor);
     }
-
 
     watcher->addPath(configWidget->get_Image_Path());
 
@@ -395,4 +428,12 @@ void PhotoPrint::printActiveTimerTimeout()
     // print active timer timed out.
     // restore the old view.
     set_View(printActiveViewMarker);
+}
+
+void PhotoPrint::on_backButton_clicked()
+{
+    if(currentView == viewImage)
+    {
+        set_View(viewThumbnails);
+    }
 }

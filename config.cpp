@@ -92,7 +92,7 @@ void config::loadSettings()
      }
 
      printer->setPrinterName(printerName);
-     int printerOrientation = settings.value("Printer/PrinterOrrientation").toInt();
+     int printerOrientation = settings.value("Printer/PrinterOrientation").toInt();
      switch(printerOrientation)
      {
      case 0:
