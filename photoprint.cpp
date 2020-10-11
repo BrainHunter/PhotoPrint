@@ -279,8 +279,16 @@ void PhotoPrint::set_View(ViewEnum e){
         printActiveView->hide();
         currentView = viewCart;
         break;
-    case viewPrintActive:
+    case viewPrintConfirmation:
+        ui->cartButton->hide();
+        ui->nextButton->hide();
+        ui->prevButton->hide();
         printActiveViewMarker = currentView;
+        currentView = viewPrintConfirmation;
+        break;
+
+    case viewPrintActive:
+
         printActiveView->show();
         printActiveView->resize(this->size());
         printActiveView->raise();
@@ -327,6 +335,19 @@ void PhotoPrint::set_View(ViewEnum e){
 
     // rightside, middle
     ui->nextButton->setGeometry(bx,windowMiddle-windowMiddle/2,120,windowMiddle);
+
+
+
+    // special placement for Print Confirmation
+    if(currentView == viewPrintConfirmation)
+    {
+        int windowMiddleHeight = this->size().height()/2;
+        int windowMiddleWidth = this->size().width()/2;
+        ui->printButton->setGeometry(windowMiddleWidth-10-120, windowMiddleHeight, 120,120);
+        ui->backButton->setGeometry(windowMiddleWidth+10,windowMiddleHeight,120,120);
+    }
+
+
 
 }
 
@@ -460,40 +481,48 @@ void PhotoPrint::resizeEvent(QResizeEvent *event)
 
 void PhotoPrint::on_printButton_clicked()
 {
-    if(selectedImageItem != NULL)
+
+    if(currentView != viewPrintConfirmation)
     {
-        configWidget->script_prePrint(selectedImageItem->filename );
-        // display the "printing dialog for the user."
-        set_View(viewPrintActive);
-
-        if(configWidget->get_externalPrintEnable())
+        set_View(viewPrintConfirmation);
+    }
+    else
+    {
+        if(selectedImageItem != NULL)
         {
-            // start this script blocking.. or maybe not?
-            configWidget->script_externalPrint(selectedImageItem->filename );
-        }
-        else
-        {
-            QImage img = selectedImageItem->getImage();
-            QPrinter* printer = configWidget->get_Printer();
-            qDebug() << "printer state" << printer->printerState();
-            QPainter painter(printer);
-            double xscale = printer->pageRect().width() / double(img.width());
-            double yscale = printer->pageRect().height() / double(img.height());
-            double scale = qMin(xscale, yscale);
-            qDebug() << "pageRect().width " << printer->pageRect().width();
-            qDebug() << "img.width " << img.width();
-            qDebug() << "scale " << scale;
-            //painter.translate(printer->paperRect().x() + printer->pageRect().width() / 2,
-            //                    printer->paperRect().y() + printer->pageRect().height() / 2);
-            painter.scale(scale, scale);
-            //painter.translate(-width() / 2, -height() / 2);
-            painter.drawImage(QPoint(0,0),img);
-            painter.end();
+            configWidget->script_prePrint(selectedImageItem->filename );
+            // display the "printing dialog for the user."
+            set_View(viewPrintActive);
 
-            qDebug() << "printer state" << printer->printerState();
-            qDebug() << "printer state" << printer->printerState();
-        }
+            if(configWidget->get_externalPrintEnable())
+            {
+                // start this script blocking.. or maybe not?
+                configWidget->script_externalPrint(selectedImageItem->filename );
+            }
+            else
+            {
+                QImage img = selectedImageItem->getImage();
+                QPrinter* printer = configWidget->get_Printer();
+                qDebug() << "printer state" << printer->printerState();
+                QPainter painter(printer);
+                double xscale = printer->pageRect().width() / double(img.width());
+                double yscale = printer->pageRect().height() / double(img.height());
+                double scale = qMin(xscale, yscale);
+                qDebug() << "pageRect().width " << printer->pageRect().width();
+                qDebug() << "img.width " << img.width();
+                qDebug() << "scale " << scale;
+                //painter.translate(printer->paperRect().x() + printer->pageRect().width() / 2,
+                //                    printer->paperRect().y() + printer->pageRect().height() / 2);
+                painter.scale(scale, scale);
+                //painter.translate(-width() / 2, -height() / 2);
+                painter.drawImage(QPoint(0,0),img);
+                painter.end();
 
+                qDebug() << "printer state" << printer->printerState();
+                qDebug() << "printer state" << printer->printerState();
+            }
+
+        }
     }
 }
 
@@ -509,6 +538,10 @@ void PhotoPrint::on_backButton_clicked()
     if(currentView == viewImage)
     {
         set_View(viewThumbnails);
+    }
+    if(currentView == viewPrintConfirmation)
+    {
+        set_View(printActiveViewMarker);
     }
 }
 

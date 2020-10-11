@@ -30,6 +30,7 @@ public:
             viewThumbnails,
             viewImage,
             viewCart,
+            viewPrintConfirmation,
             viewPrintActive
     };
 
