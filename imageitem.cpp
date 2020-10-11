@@ -12,14 +12,18 @@ ImageItem::ImageItem(QString filename,  QSize ThumbnailSize, QObject *parent) :Q
 
 
     // change font size to 1 -> minimize the gap between the Items
+
+// #define SHOW_FILENAMES
+#ifndef  SHOW_FILENAMES
     QFont f = this->font();
     f.setPointSizeF(0.01);
     this->setFont(f);
-
     // set text color to transparent --> invisible
     setForeground(Qt::transparent);
-
-
+#else
+    // make text visible
+    //setForeground(Qt::white);
+#endif
 
     // read the image and scale:
     //QImageReader reader(filename);
@@ -69,3 +73,23 @@ void ImageItem::thumbnailLoaded(QString file, QImage img)
     // set filename as text, this helps sorting the images. the text is hidden, see constructor
     this->setText(this->filename);
 }
+
+inline bool ImageItem::operator<(const ImageItem &other ) const
+{
+    qDebug() << "hello";
+    return filename < other.filename;
+}
+
+inline bool operator<(const ImageItem &i1 , const ImageItem &i2 )
+{
+    qDebug() << "hello";
+    return i1.filename < i2.filename;
+}
+
+inline bool operator<(ImageItem &i1 , ImageItem &i2 )
+{
+    qDebug() << "hello";
+    return i1.filename < i2.filename;
+}
+
+

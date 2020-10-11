@@ -14,7 +14,7 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     // no image is selected at the beginig:
     selectedImageItem = NULL;
 
-    // thumbnail view list
+    // ----  thumbnail view list  ----
     ui->listWidget->setViewMode(QListWidget::IconMode);
     ui->listWidget->setMovement(QListView::Static);
     ui->listWidget->setIconSize(QSize(200,200));
@@ -29,9 +29,12 @@ PhotoPrint::PhotoPrint(QWidget *parent)
 
     // list widget background color:
     ui->listWidget->setStyleSheet("QListWidget{ background: black; } ");
+    ui->listWidget->setFrameShape(QFrame::NoFrame); // this removes the white border
+    // enable sorting in the listWidget
+    ui->listWidget->setSortingEnabled(true);
 
 
-    // scrolling thingy
+    // ---- scrolling thingy ----
     QScrollerProperties sp;
     sp.setScrollMetric(QScrollerProperties::DragVelocitySmoothingFactor, 0.6);
     sp.setScrollMetric(QScrollerProperties::MinimumVelocity, 0.0);
@@ -48,17 +51,17 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     scroller->setScrollerProperties(sp);
 
 
-    //config widget
+    // ---- config widget ----
     configWidget->setParent(this);
     connect(configWidget, SIGNAL(StartButton_clicked()), this, SLOT(start()));
     qDebug() << configWidget->palette().color(QWidget::backgroundRole()).name();
 
 
-    // Image View;
+    // ---- Image View ----
     imgView->hide();
     connect(imgView, SIGNAL(Mouse_pressed()), this, SLOT(on_imageView_Pressed()));
 
-    // print Active view
+    // ---- print Active view ----
     printActiveView->hide();
     printActiveView->setImage(QImage("icons/printActive.png"));
     // print Active timer:
@@ -66,13 +69,14 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     connect(printActiveTimer,SIGNAL(timeout()),this,SLOT(printActiveTimerTimeout()));
 
 
-    // File System checker
+    // ----- File System checker -----
     watcher = new QFileSystemWatcher(this);
     connect(watcher,SIGNAL(directoryChanged(QString)),this,SLOT(fileSystemUpdated(QString)));
 
-    // Buttons:
+    // --------  Buttons: --------
     // ---- printButton ----
     ui->printButton->hide();
+    ui->printButton->setStyleSheet("background-color: rgba(255, 255, 255, 50);");
     if(QFile::exists("icons/print.png"))
     {
         ui->printButton->setIcon(QIcon("icons/print.png"));
@@ -85,6 +89,7 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     }
     // ---- cartButton ----
     ui->cartButton->hide();
+    ui->cartButton->setStyleSheet("background-color: rgba(255, 255, 255, 50);");
     if(QFile::exists("icons/cart.png"))
     {
         ui->cartButton->setIcon(QIcon("icons/cart.png"));
@@ -98,6 +103,7 @@ PhotoPrint::PhotoPrint(QWidget *parent)
 
     // ---- backButton ----
     ui->backButton->hide();
+    ui->backButton->setStyleSheet("background-color: rgba(255, 255, 255, 50);");
     if(QFile::exists("icons/back.png"))
     {
         ui->backButton->setIcon(QIcon("icons/back.png"));
@@ -106,10 +112,59 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     }
     else
     {
-        ui->backButton->setText("Back");
+        ui->backButton->setText("↶"); // unicode: U+21B6
+        QFont font = ui->backButton->font();
+        font.setBold(true);
+        font.setPointSize(100);
+        ui->backButton->setFont(font);
     }
 
-    // set default view:
+    // ---- next Button ----
+    ui->nextButton->hide();
+    ui->nextButton->setStyleSheet("background-color: rgba(255, 255, 255, 50);");
+    if(QFile::exists("icons/next.png"))
+    {
+        ui->nextButton->setIcon(QIcon("icons/next.png"));
+        ui->nextButton->setIconSize(QSize(100,100));
+        ui->nextButton->setText("");
+    }
+    else
+    {
+        ui->nextButton->setText("❯"); // Unicode U+276F
+        QFont font = ui->nextButton->font();
+        font.setBold(true);
+        font.setPointSize(100);
+        ui->nextButton->setFont(font);
+
+    }
+    // ---- previousButton ----
+    ui->prevButton->hide();
+    ui->prevButton->setStyleSheet("background-color: rgba(255, 255, 255, 50);");
+    if(QFile::exists("icons/previous.png"))
+    {
+        ui->prevButton->setIcon(QIcon("icons/previous.png"));
+        ui->prevButton->setIconSize(QSize(100,100));
+        ui->prevButton->setText("");
+    }
+    else
+    {
+        ui->prevButton->setText("❮");  // Unicode U+276E
+
+        QFont font = ui->prevButton->font();
+        font.setBold(true);
+        font.setPointSize(100);
+        ui->prevButton->setFont(font);
+
+        //auto effect = new QGraphicsOpacityEffect(this);
+        //effect->setOpacity(0.5);
+        //ui->prevButton->setGraphicsEffect(effect);
+        //ui->prevButton->setAutoFillBackground(true);
+    }
+
+    // -------- END  Buttons --------
+
+
+    // ---- set default view ----
     set_View(viewConfig);
 
     // autostart
@@ -179,6 +234,8 @@ void PhotoPrint::set_View(ViewEnum e){
         ui->printButton->hide();
         ui->cartButton->hide();
         ui->backButton->hide();
+        ui->nextButton->hide();
+        ui->prevButton->hide();
         currentView = viewConfig;
         break;
     case viewThumbnails:
@@ -189,6 +246,8 @@ void PhotoPrint::set_View(ViewEnum e){
         ui->printButton->hide();
         ui->cartButton->hide();
         ui->backButton->hide();
+        ui->nextButton->hide();
+        ui->prevButton->hide();
 
         configWidget->script_setViewThumbnails(); // execute the external script
 
@@ -208,6 +267,8 @@ void PhotoPrint::set_View(ViewEnum e){
         }
         ui->cartButton->setVisible(configWidget->get_shoppingCartEnable());
         ui->backButton->show();
+        ui->nextButton->show();
+        ui->prevButton->show();
 
         configWidget->script_setViewImage(selectedImageItem->filename); // execute the external script
 
@@ -226,6 +287,8 @@ void PhotoPrint::set_View(ViewEnum e){
 
         ui->printButton->hide();
         ui->cartButton->hide();
+        ui->nextButton->hide();
+        ui->prevButton->hide();
 
         // start the printActiveTimer which restores the old view once timed out
         printActiveTimer->start(5000);
@@ -235,9 +298,16 @@ void PhotoPrint::set_View(ViewEnum e){
        break;
     }
 
-    // place buttons:
+    // ---- place buttons: -----
+    // Left side, top:
     int bx = 20;    // left
     int by = 20;     // top
+    ui->backButton->setGeometry(bx,by,120,120);
+
+
+    // Right side, top:
+    bx = this->size().width() - 20 - 120;
+    by = 20;
     if(ui->printButton->isVisible())
     {
         ui->printButton->setGeometry(bx, by, 120,120);
@@ -249,10 +319,14 @@ void PhotoPrint::set_View(ViewEnum e){
         by = by + 20 + 120; // next button is further down
     }
 
-    bx = this->size().width() - 20 - 120;
-    by = 20;
-    ui->backButton->setGeometry(bx,by,120,120);
 
+    // left side, middle
+    int windowMiddle = this->size().height()/2;
+
+    ui->prevButton->setGeometry(20,windowMiddle-windowMiddle/2,120,windowMiddle);
+
+    // rightside, middle
+    ui->nextButton->setGeometry(bx,windowMiddle-windowMiddle/2,120,windowMiddle);
 
 }
 
@@ -435,5 +509,59 @@ void PhotoPrint::on_backButton_clicked()
     if(currentView == viewImage)
     {
         set_View(viewThumbnails);
+    }
+}
+
+void PhotoPrint::on_nextButton_clicked()
+{
+    if(currentView == viewImage)
+    {
+        // get current item
+        int row = ui->listWidget->currentRow();
+        //qDebug() << row;
+        row++;
+        // check for overflow
+        if(row==ui->listWidget->count()) row = 0;
+
+        // display and set the new item
+        selectedImageItem = (ImageItem*)ui->listWidget->item(row);
+        ui->listWidget->setCurrentItem(selectedImageItem);
+        imgView->setImage(selectedImageItem->getImage());
+        imgView->resize(this->size());
+
+
+        /*
+        // well not the most elegant way...
+        QMap<QString, ImageItem *>::iterator i = imageMap.find(selectedImageItem->filename);
+        qDebug() << "selectedImage" << selectedImageItem->filename;
+        i++;
+        if(i == imageMap.end()){
+            i=imageMap.begin();
+        }
+
+        selectedImageItem = i.value();
+        // get the filename:
+        imgView->setImage(selectedImageItem->getImage());
+        imgView->resize(this->size());
+        */
+    }
+}
+
+void PhotoPrint::on_prevButton_clicked()
+{
+    if(currentView == viewImage)
+    {
+        // get current item
+        int row = ui->listWidget->currentRow();
+        //qDebug() << row;
+        row--;
+        // check for overflow
+        if(row==-1) row += ui->listWidget->count();
+
+        // display and set the new item
+        selectedImageItem = (ImageItem*)ui->listWidget->item(row);
+        ui->listWidget->setCurrentItem(selectedImageItem);
+        imgView->setImage(selectedImageItem->getImage());
+        imgView->resize(this->size());
     }
 }

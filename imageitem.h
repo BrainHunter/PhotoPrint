@@ -17,6 +17,8 @@ public:
     // read the image from the harddisk again and return:
     QImage          getImage();
 
+    bool operator<(const ImageItem &other ) const;
+
 public slots:
     void thumbnailLoaded(QString file, QImage img);
 

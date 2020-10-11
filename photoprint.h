@@ -51,6 +51,10 @@ private slots:
 
     void on_backButton_clicked();
 
+    void on_nextButton_clicked();
+
+    void on_prevButton_clicked();
+
 private:
     Ui::PhotoPrint *ui;
 
