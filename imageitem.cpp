@@ -16,7 +16,7 @@ ImageItem::ImageItem(QString filename,  QSize ThumbnailSize, QObject *parent) :Q
 // #define SHOW_FILENAMES
 #ifndef  SHOW_FILENAMES
     QFont f = this->font();
-    f.setPointSizeF(0.01);
+    f.setPointSizeF(1);
     this->setFont(f);
     // set text color to transparent --> invisible
     setForeground(Qt::transparent);
