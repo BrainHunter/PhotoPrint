@@ -64,6 +64,9 @@ void ImageView::resize(QSize size)
     if(imageLabel->pixmap() != NULL) // if no image is loaded don't do this
     {
         QSize imgSize = image.size();
+        if(imgSize.width() == 0){
+            throw 1;
+        }
         QSize tempSize = size;
         if(cutHeight)
         {   // modify the height to "oversize" the image --> the upper and lower borders will be cut when the image is centered in the window.

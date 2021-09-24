@@ -450,8 +450,17 @@ void PhotoPrint::on_listWidget_itemClicked(QListWidgetItem *item)
 
     selectedImageItem = (ImageItem*)item;
     // get the filename:
-    imgView->setImage(selectedImageItem->getImage());
-    imgView->resize(this->size());
+    try {
+        imgView->setImage(selectedImageItem->getImage());
+        imgView->resize(this->size());
+    } catch (...) {
+        qWarning() << "error loading image" << selectedImageItem->filename;
+        // removing selected ImageItem from List and ImageMap:
+        imageMap.remove(selectedImageItem->filename);
+        delete selectedImageItem;
+        return;
+    }
+
 
     //view image:
     set_View(viewImage);
