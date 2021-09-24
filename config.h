@@ -29,6 +29,8 @@ public:
     bool get_autostart();
     bool get_showFullscreen();
     QSize get_ThumbnailSize();
+    uint get_ThumbnailScrollDownTimeout();
+
     uint get_printActiveTimeout();
 
     bool get_externalPrintEnable();

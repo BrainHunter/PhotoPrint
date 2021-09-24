@@ -8,6 +8,7 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     , imgView(new ImageView(this))
     , printActiveView(new ImageView(this))
     , printActiveTimer(new QTimer(this))
+    , thumbnailScrollDownTimer(new QTimer(this))
 {
     ui->setupUi(this);
 
@@ -50,6 +51,11 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     scroller->grabGesture(ui->listWidget, QScroller::LeftMouseButtonGesture);
     scroller->setScrollerProperties(sp);
 
+    connect(scroller,SIGNAL(stateChanged(QScroller::State)), this, SLOT(listWidget_ScrollerStateChanged(QScroller::State)));
+
+    // thumbnailScrollDownTimer
+    thumbnailScrollDownTimer->setSingleShot(true);
+    connect(thumbnailScrollDownTimer,SIGNAL(timeout()),this,SLOT(thumbnailScrollDownTimer_Timeout()));
 
     // ---- config widget ----
     configWidget->setParent(this);
@@ -218,6 +224,10 @@ bool PhotoPrint::checkForNewImages(QString path)
 
 
 void PhotoPrint::set_View(ViewEnum e){
+
+    thumbnailScrollDownTimer->stop(); // always stop the scroll down timer
+
+
     switch(e)
     {
     case viewConfig:
@@ -250,6 +260,9 @@ void PhotoPrint::set_View(ViewEnum e){
         ui->prevButton->hide();
 
         configWidget->script_setViewThumbnails(); // execute the external script
+
+        //Start the Scrolldown Timer:
+        thumbnailScrollDownTimer->start(configWidget->get_ThumbnailScrollDownTimeout()*1000);
 
         currentView = viewThumbnails;
         break;
@@ -533,6 +546,30 @@ void PhotoPrint::printActiveTimerTimeout()
     set_View(printActiveViewMarker);
 }
 
+void PhotoPrint::thumbnailScrollDownTimer_Timeout()
+{
+    // ui was not touched until timeout. scroll down to the newest images
+    ui->listWidget->scrollToBottom();
+    qInfo() << "thumbnailScrollDownTimer Timeout";
+}
+
+void PhotoPrint::listWidget_ScrollerStateChanged(QScroller::State newState)
+{
+    qInfo() << "listWidget_ScrollerStateChanged: " << newState;
+
+    if(currentView == viewThumbnails)
+    {
+        if(newState == QScroller::Inactive) // restart the scroll down timer
+        {
+            thumbnailScrollDownTimer->start(configWidget->get_ThumbnailScrollDownTimeout()*1000);
+        }
+        else
+        {
+            thumbnailScrollDownTimer->stop();
+        }
+    }
+}
+
 void PhotoPrint::on_backButton_clicked()
 {
     if(currentView == viewImage)
@@ -598,3 +635,4 @@ void PhotoPrint::on_prevButton_clicked()
         imgView->resize(this->size());
     }
 }
+

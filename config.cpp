@@ -117,6 +117,12 @@ void config::loadSettings()
      {
         ui->thumbnailSizeSpinBox->setValue(ThumbnailSize);
      }
+     uint ThumbnailScrollDownTimeout = settings.value("ThumbnailView/ThumbnailScrollDownTimeout", "60").toUInt();
+     if (ui->thumbnailScrollDownTimeoutSpinBox)
+     {
+        ui->thumbnailScrollDownTimeoutSpinBox->setValue(ThumbnailScrollDownTimeout);
+     }
+
 
      // update ui
      setPrinterUi();
@@ -150,6 +156,7 @@ void config::saveSettings()
      //thumbnail view settings:
      settings.beginGroup("ThumbnailView");
      settings.setValue("ThumbnailSize", ui->thumbnailSizeSpinBox->value());
+     settings.setValue("ThumbnailScrollDownTimeout", (uint)ui->thumbnailScrollDownTimeoutSpinBox->value());
      settings.endGroup();
 }
 
@@ -401,4 +408,9 @@ QSize config::get_ThumbnailSize()
 {
 
     return QSize(ui->thumbnailSizeSpinBox->value(), ui->thumbnailSizeSpinBox->value());
+}
+
+uint config::get_ThumbnailScrollDownTimeout()
+{
+    return (uint)ui->thumbnailScrollDownTimeoutSpinBox->value();
 }

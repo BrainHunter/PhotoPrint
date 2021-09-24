@@ -56,6 +56,9 @@ private slots:
 
     void on_prevButton_clicked();
 
+    void thumbnailScrollDownTimer_Timeout();
+    void listWidget_ScrollerStateChanged(QScroller::State newState);
+
 private:
     Ui::PhotoPrint *ui;
 
@@ -80,6 +83,9 @@ private:
     //Timer for Printactive message
     QTimer* printActiveTimer;
     ViewEnum printActiveViewMarker;
+
+    // Timer for automatic scroll down:
+    QTimer* thumbnailScrollDownTimer;
 
 };
 #endif // PHOTOPRINT_H
