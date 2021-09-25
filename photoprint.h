@@ -5,6 +5,7 @@
 #include "config.h"
 #include "imageitem.h"
 #include "imageview.h"
+#include "filecopyrunner.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class PhotoPrint; }
@@ -41,10 +42,11 @@ private slots:
     void on_listWidget_itemActivated(QListWidgetItem *item);
 
     void on_listWidget_itemClicked(QListWidgetItem *item);
-    void on_imageView_Pressed();
+    void on_imageViewpressed();
 
     void on_listWidget_itemChanged(QListWidgetItem *item);
     void fileSystemUpdated(QString string);
+    void fileCopyFinished(QString destinationFile);
 
     void on_printButton_clicked();
 
@@ -78,6 +80,7 @@ private:
     ImageItem* selectedImageItem;
 
     bool checkForNewImages(QString path);
+    void addNewImage(QString file);
     QFileSystemWatcher* watcher;
 
     //Timer for Printactive message
@@ -86,6 +89,7 @@ private:
 
     // Timer for automatic scroll down:
     QTimer* thumbnailScrollDownTimer;
+
 
 };
 #endif // PHOTOPRINT_H

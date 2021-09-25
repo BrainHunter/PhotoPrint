@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     config.cpp \
+    filecopyrunner.cpp \
     imageitem.cpp \
     imagescalerunner.cpp \
     imageview.cpp \
@@ -26,6 +27,7 @@ SOURCES += \
 
 HEADERS += \
     config.h \
+    filecopyrunner.h \
     imageitem.h \
     imagescalerunner.h \
     imageview.h \

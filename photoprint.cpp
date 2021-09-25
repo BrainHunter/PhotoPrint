@@ -1,6 +1,8 @@
 #include "photoprint.h"
 #include "ui_photoprint.h"
 
+#include "filecopyrunner.h"
+
 PhotoPrint::PhotoPrint(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::PhotoPrint)
@@ -65,7 +67,7 @@ PhotoPrint::PhotoPrint(QWidget *parent)
 
     // ---- Image View ----
     imgView->hide();
-    connect(imgView, SIGNAL(Mouse_pressed()), this, SLOT(on_imageView_Pressed()));
+    connect(imgView, SIGNAL(Mouse_pressed()), this, SLOT(on_imageViewpressed()));
 
     // ---- print Active view ----
     printActiveView->hide();
@@ -205,21 +207,73 @@ bool PhotoPrint::checkForNewImages(QString path)
         QString tmp=dirList.last().absoluteFilePath();
         dirList.removeLast();
 
-        if(!imageMap.contains(tmp))
+        if(configWidget->get_localCopyEnabled())
         {
-            ImageItem *it;
-            it = new ImageItem(tmp, configWidget->get_ThumbnailSize());
-            ret = true;
+            QFileInfo srcFile(tmp);
+            QString dstFile = configWidget->get_LocalCopyPath() + "//" +  srcFile.fileName();
 
-            // insert into image map:
-            imageMap.insert(tmp,it);
-            qInfo() << "adding to map:" + tmp;
+            if(!imageMap.contains(dstFile))
+            {
+                // check if dst file is allready copied:
+                if(QFile::exists(dstFile))
+                {
+                    addNewImage(tmp);
+                    ret = true;
+                    continue;
+                }
 
-            // insert into widget
-            ui->listWidget->addItem(it);
+                // TODO : check if another runner is active
+                if(! FileCopyRunner::isRunning()) //there might be a short time when running is false but finished signal is not emitted. so there is a chance that two copy processes get started.
+                {
+                    FileCopyRunner *runner = new FileCopyRunner(tmp, dstFile);  // do not set parent of runner thread as emit will fail
+                    QObject::connect(runner, SIGNAL(finished(QString)), this, SLOT(fileCopyFinished(QString)),Qt::QueuedConnection);
+                    QThreadPool::globalInstance()->start(runner);
+                }
+                else
+                {
+                    break;
+                }
+                // only start one copy at a time
+                // if there are more files to be copied over, this function will be called again by the fileCopyFinished slot
+                ret = true;
+                break;
+            }
         }
+        else
+        {
+            if(!imageMap.contains(tmp))
+            {
+                addNewImage(tmp);
+                ret = true;
+            }
+        }
+
     }
     return ret;
+}
+
+// this is called indirectly by checkForNewImages via the copy runner
+void PhotoPrint::fileCopyFinished(QString destinationFile)
+{
+    // add the newly copied file
+    addNewImage(destinationFile);
+
+    // check again for new images:
+    checkForNewImages(configWidget->get_Image_Path());
+}
+
+
+void PhotoPrint::addNewImage(QString file)
+{
+    ImageItem *it;
+    it = new ImageItem(file, configWidget->get_ThumbnailSize());
+
+    // insert into image map:
+    imageMap.insert(file,it);
+    qInfo() << "adding to map:" + file;
+
+    // insert into widget
+    ui->listWidget->addItem(it);
 }
 
 
@@ -431,7 +485,7 @@ void PhotoPrint::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void PhotoPrint::on_imageView_Pressed()
+void PhotoPrint::on_imageViewpressed()
 {
     if(currentView == viewImage)
     {
@@ -457,7 +511,7 @@ void PhotoPrint::on_listWidget_itemClicked(QListWidgetItem *item)
         qWarning() << "error loading image" << selectedImageItem->filename;
         // removing selected ImageItem from List and ImageMap:
         imageMap.remove(selectedImageItem->filename);
-        delete selectedImageItem;
+        delete selectedImageItem; // delete the item will also remove it from the list
         return;
     }
 

@@ -123,6 +123,19 @@ void config::loadSettings()
         ui->thumbnailScrollDownTimeoutSpinBox->setValue(ThumbnailScrollDownTimeout);
      }
 
+     // File Copy
+     bool LocalCopyEnabled = settings.value("FileCopy/LocalCopyEnabled", "false").toBool();
+     if (ui->localCopyEnableCheckBox)
+     {
+        ui->localCopyEnableCheckBox->setChecked(LocalCopyEnabled);
+        on_localCopyEnableCheckBox_clicked(LocalCopyEnabled);
+     }
+     QString LocalCopyDirectory = settings.value("FileCopy/LocalCopyDirectory", "C:\\Photos-Temp").toString();
+     if (ui->directoryLocalCopyEdit)
+     {
+        ui->directoryLocalCopyEdit->setText(LocalCopyDirectory);
+     }
+
 
      // update ui
      setPrinterUi();
@@ -157,6 +170,12 @@ void config::saveSettings()
      settings.beginGroup("ThumbnailView");
      settings.setValue("ThumbnailSize", ui->thumbnailSizeSpinBox->value());
      settings.setValue("ThumbnailScrollDownTimeout", (uint)ui->thumbnailScrollDownTimeoutSpinBox->value());
+     settings.endGroup();
+
+     // File Copy
+     settings.beginGroup("FileCopy");
+     settings.setValue("LocalCopyEnabled", ui->localCopyEnableCheckBox->isChecked());
+     settings.setValue("LocalCopyDirectory", ui->directoryLocalCopyEdit->text());
      settings.endGroup();
 }
 
@@ -413,4 +432,36 @@ QSize config::get_ThumbnailSize()
 uint config::get_ThumbnailScrollDownTimeout()
 {
     return (uint)ui->thumbnailScrollDownTimeoutSpinBox->value();
+}
+
+
+//// ------------------- File Copy thingies ---------------
+///
+///
+///
+///
+///
+
+void config::on_localCopyEnableCheckBox_clicked(bool checked)
+{
+    ui->localCopyLabel->setEnabled(checked);
+    ui->directoryLocalCopyEdit->setEnabled(checked);
+    ui->browseLocalCopyButton->setEnabled(checked);
+}
+
+
+bool config::get_localCopyEnabled()
+{
+    return ui->localCopyEnableCheckBox->isChecked();
+}
+
+QString config::get_LocalCopyPath()
+{
+    return ui->directoryLocalCopyEdit->text();
+}
+
+void config::on_browseLocalCopyButton_clicked()
+{
+    QUrl newPath = QFileDialog::getExistingDirectory(this, tr("Open Directory"), ui->directoryLocalCopyEdit->text());
+    ui->directoryLocalCopyEdit->setText(newPath.toString());
 }

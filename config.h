@@ -41,6 +41,9 @@ public:
     bool script_setViewThumbnails(bool blocking=false);
     bool script_setViewCart(bool blocking=false);
 
+    bool get_localCopyEnabled();
+    QString get_LocalCopyPath();
+
 private slots:
     void on_saveButton_clicked();
 
@@ -51,6 +54,11 @@ private slots:
     void on_pushButton_clicked();
 
     void on_printerSelectButton_clicked();
+
+
+    void on_localCopyEnableCheckBox_clicked(bool checked);
+
+    void on_browseLocalCopyButton_clicked();
 
 private:
     Ui::config *ui;
