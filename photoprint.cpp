@@ -62,7 +62,7 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     // ---- config widget ----
     configWidget->setParent(this);
     connect(configWidget, SIGNAL(StartButton_clicked()), this, SLOT(start()));
-    qDebug() << configWidget->palette().color(QWidget::backgroundRole()).name();
+    //qDebug() << configWidget->palette().color(QWidget::backgroundRole()).name();
 
 
     // ---- Image View ----
@@ -217,7 +217,7 @@ bool PhotoPrint::checkForNewImages(QString path)
                 // check if dst file is allready copied:
                 if(QFile::exists(dstFile))
                 {
-                    addNewImage(tmp);
+                    addNewImage(dstFile);
                     ret = true;
                     continue;
                 }
