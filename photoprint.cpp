@@ -366,7 +366,7 @@ void PhotoPrint::set_View(ViewEnum e){
         ui->prevButton->hide();
 
         // start the printActiveTimer which restores the old view once timed out
-        printActiveTimer->start(5000);
+        printActiveTimer->start(configWidget->get_printActiveTimeout()*1000);
         currentView = viewPrintActive;
         break;
     default:
