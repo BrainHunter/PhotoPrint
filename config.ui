@@ -58,7 +58,7 @@
     <enum>QTabWidget::Triangular</enum>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="PrinterSettingsTab">
     <attribute name="title">
@@ -381,6 +381,22 @@
       </item>
      </layout>
     </widget>
+    <widget class="QLabel" name="label_14">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>230</y>
+       <width>401</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Note: Scripting is possible but script filenames are hardcoded</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
@@ -635,7 +651,7 @@
    </widget>
    <widget class="QCheckBox" name="shoppingCartCheckBox">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
