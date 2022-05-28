@@ -2,6 +2,8 @@
 #include "ui_photoprint.h"
 
 #include "filecopyrunner.h"
+#include <QPrintPreviewDialog>
+
 
 PhotoPrint::PhotoPrint(QWidget *parent)
     : QWidget(parent)
@@ -426,7 +428,8 @@ void PhotoPrint::on_pushButton_clicked()
 
     // checkForNewImages(configWidget->get_Image_Path());
 
-    ui->listWidget->sortItems();
+    //ui->listWidget->sortItems();
+
 }
 
 void PhotoPrint::start()
@@ -577,29 +580,53 @@ void PhotoPrint::on_printButton_clicked()
             }
             else
             {
-                QImage img = selectedImageItem->getImage();
                 QPrinter* printer = configWidget->get_Printer();
                 qDebug() << "printer state" << printer->printerState();
-                QPainter painter(printer);
-                double xscale = printer->pageRect().width() / double(img.width());
-                double yscale = printer->pageRect().height() / double(img.height());
-                double scale = qMin(xscale, yscale);
-                qDebug() << "pageRect().width " << printer->pageRect().width();
-                qDebug() << "img.width " << img.width();
-                qDebug() << "scale " << scale;
-                //painter.translate(printer->paperRect().x() + printer->pageRect().width() / 2,
-                //                    printer->paperRect().y() + printer->pageRect().height() / 2);
-                painter.scale(scale, scale);
-                //painter.translate(-width() / 2, -height() / 2);
-                painter.drawImage(QPoint(0,0),img);
-                painter.end();
 
+                bool preview = 1;
+
+                if(preview)
+                {
+                    QPrintPreviewDialog preview(printer, this);
+                    preview.setWindowFlags ( Qt::Window );
+                    connect(&preview, SIGNAL(paintRequested(QPrinter* )), SLOT(PaintPage(QPrinter* )));
+                    preview.exec();
+                }
+                else
+                {
+                    PaintPage(printer);
+                }
                 qDebug() << "printer state" << printer->printerState();
                 qDebug() << "printer state" << printer->printerState();
             }
-
         }
     }
+}
+
+void PhotoPrint::PaintPage(QPrinter* printer){
+    QImage img = selectedImageItem->getImage();
+    QPainter painter(printer);
+    double xscale = printer->pageRect().width() / double(img.width());
+    double yscale = printer->pageRect().height() / double(img.height());
+    double scale = qMin(xscale, yscale);
+    qDebug() << "pageRect().width " << printer->pageRect().width() << " pageRect().height " << printer->pageRect().height();
+    qDebug() << "img.width " << img.width()<< " img.height " << img.height();
+    qDebug() << "scale " << scale;
+    //painter.translate(printer->paperRect().x() + printer->pageRect().width() / 2,
+    //                    printer->paperRect().y() + printer->pageRect().height() / 2);
+    painter.scale(scale, scale);
+    //painter.translate(-width() / 2, -height() / 2);
+    painter.drawImage(QPoint(0,0),img);
+
+    // draw QRCode
+    //painter.scale(1/scale, 1/scale);
+    painter.resetTransform();
+    //QImage QRCodeImage = configWidget->get_QRCodeImage()->scaledToHeight(printer->pageRect().height()-20);
+    //painter.drawImage(QPoint(10 + img.width()*scale,10),QRCodeImage);
+    QImage QRCodeImage = configWidget->get_QRCodeImage()->scaledToHeight(120);
+    painter.drawImage(QPoint(10 ,10),QRCodeImage);
+
+    painter.end();
 }
 
 void PhotoPrint::printActiveTimerTimeout()
@@ -698,4 +725,5 @@ void PhotoPrint::on_prevButton_clicked()
         imgView->resize(this->size());
     }
 }
+
 

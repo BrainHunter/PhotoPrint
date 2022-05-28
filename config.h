@@ -34,6 +34,7 @@ public:
     uint get_printActiveTimeout();
 
     bool get_externalPrintEnable();
+    QImage* get_QRCodeImage();
 
     bool script_prePrint(QString filename, bool blocking=false);
     bool script_externalPrint(QString filename, bool blocking=true);
@@ -60,6 +61,10 @@ private slots:
 
     void on_browseLocalCopyButton_clicked();
 
+    void on_QRCodeGenerateButton_clicked();
+
+    void on_QRCodeLinkEdit_textChanged(const QString &arg1);
+
 private:
     Ui::config *ui;
     void SetReadOnly(QRadioButton* RadioButton, bool readOnly);
@@ -73,6 +78,10 @@ private:
     // Printer things:
     QPrinter *printer;
     void setPrinterUi();
+
+    // QRCode things:
+    void updateQrCode( QString text );
+    QImage* QRCodeImage;
 
     // External Script
     bool executeExternal(QString filename, QStringList arguments, bool blocking );

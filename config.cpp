@@ -5,10 +5,13 @@
 #include <QPrintDialog>
 #include <QPrinterInfo>
 
+#include "QR-Code-generator\cpp\qrcodegen.hpp"
+
 
 config::config(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::config)
+    ui(new Ui::config),
+    QRCodeImage(NULL)
 {
     ui->setupUi(this);
 
@@ -319,6 +322,8 @@ bool config::get_externalPrintEnable()
     return ui->externalPrintCheckBox->isChecked();
 }
 
+
+
 //// ------------------- Script thingies ---------------
 ///
 ///
@@ -464,4 +469,52 @@ void config::on_browseLocalCopyButton_clicked()
 {
     QUrl newPath = QFileDialog::getExistingDirectory(this, tr("Open Directory"), ui->directoryLocalCopyEdit->text());
     ui->directoryLocalCopyEdit->setText(newPath.toString());
+}
+
+
+//// ------------------- QRCode thingies ---------------
+///
+///
+///
+///
+///
+
+
+void config::on_QRCodeGenerateButton_clicked()
+{
+    updateQrCode(ui->QRCodeLinkEdit->text());
+}
+
+void config::updateQrCode( QString text )
+{
+  using namespace qrcodegen;
+  // Create the QR Code object
+  QrCode qr = QrCode::encodeText( text.toUtf8().data(), QrCode::Ecc::MEDIUM );
+  qint32 sz = qr.getSize();
+  qDebug() << "QRCode size" << sz;
+  if(QRCodeImage != NULL)
+  {
+      delete QRCodeImage;
+  }
+  QRCodeImage = new QImage(sz,sz, QImage::Format_RGB32);
+    QRgb black = qRgb(  0,  0,  0);
+    QRgb white = qRgb(255,255,255);
+  for (int y = 0; y < sz; y++)
+    for (int x = 0; x < sz; x++)
+      QRCodeImage->setPixel(x,y,qr.getModule(x, y) ? black : white );
+  ui->QRCodeLabel->setPixmap( QPixmap::fromImage(QRCodeImage->scaled(160,160,Qt::KeepAspectRatio,Qt::FastTransformation),Qt::MonoOnly) );
+}
+
+void config::on_QRCodeLinkEdit_textChanged(const QString &arg1)
+{
+    updateQrCode(arg1);
+}
+
+QImage *config::get_QRCodeImage()
+{
+    if(QRCodeImage == NULL)
+    {
+        updateQrCode(ui->QRCodeLinkEdit->text());
+    }
+    return QRCodeImage;
 }

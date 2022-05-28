@@ -51,6 +51,7 @@ private slots:
     void on_printButton_clicked();
 
     void printActiveTimerTimeout();
+    void PaintPage(QPrinter* printer);
 
     void on_backButton_clicked();
 

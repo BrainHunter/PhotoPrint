@@ -23,7 +23,8 @@ SOURCES += \
     imagescalerunner.cpp \
     imageview.cpp \
     main.cpp \
-    photoprint.cpp
+    photoprint.cpp \
+    QR-Code-generator\cpp\qrcodegen.cpp
 
 HEADERS += \
     config.h \
@@ -31,7 +32,8 @@ HEADERS += \
     imageitem.h \
     imagescalerunner.h \
     imageview.h \
-    photoprint.h
+    photoprint.h \
+    QR-Code-generator\cpp\qrcodegen.hpp
 
 FORMS += \
     config.ui \

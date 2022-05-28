@@ -58,7 +58,7 @@
     <enum>QTabWidget::Triangular</enum>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="PrinterSettingsTab">
     <attribute name="title">
@@ -245,6 +245,69 @@
      </property>
      <property name="text">
       <string>Show Print Active for</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="QRCodeTab">
+    <attribute name="title">
+     <string>QR Code</string>
+    </attribute>
+    <widget class="QLabel" name="QRCodeLabel">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>90</y>
+       <width>160</width>
+       <height>160</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="text">
+      <string>QR Preview</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="QRCodeLinkEdit">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>10</y>
+       <width>371</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>https://github.com/BrainHunter/PhotoPrint</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_15">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>12</y>
+       <width>47</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Link:</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="QRCodeGenerateButton">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>40</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Generate</string>
      </property>
     </widget>
    </widget>
