@@ -606,8 +606,10 @@ void PhotoPrint::on_printButton_clicked()
 void PhotoPrint::PaintPage(QPrinter* printer){
     QImage img = selectedImageItem->getImage();
     QPainter painter(printer);
-    double xscale = printer->pageRect().width() / double(img.width());
-    double yscale = printer->pageRect().height() / double(img.height());
+    //double xscale = printer->pageRect().width() / double(img.width());
+    //double yscale = printer->pageRect().height() / double(img.height());
+    double xscale = printer->paperRect().width() / double(img.width());
+    double yscale = printer->paperRect().height() / double(img.height());
     double scale = qMin(xscale, yscale);
     qDebug() << "pageRect().width " << printer->pageRect().width() << " pageRect().height " << printer->pageRect().height();
     qDebug() << "img.width " << img.width()<< " img.height " << img.height();
@@ -619,12 +621,80 @@ void PhotoPrint::PaintPage(QPrinter* printer){
     painter.drawImage(QPoint(0,0),img);
 
     // draw QRCode
-    //painter.scale(1/scale, 1/scale);
-    painter.resetTransform();
-    //QImage QRCodeImage = configWidget->get_QRCodeImage()->scaledToHeight(printer->pageRect().height()-20);
-    //painter.drawImage(QPoint(10 + img.width()*scale,10),QRCodeImage);
-    QImage QRCodeImage = configWidget->get_QRCodeImage()->scaledToHeight(120);
-    painter.drawImage(QPoint(10 ,10),QRCodeImage);
+    if(configWidget->get_QRCodeEnabled())
+    {
+        uint scaledImageWidth = img.width()*scale;
+        uint scaledImageHeight = img.height()*scale;
+        uint x=0,y=0;
+        uint distance = configWidget->get_QRCodeDistance(); // distance from border
+        QImage* QRCodeImage = configWidget->get_QRCodeImage();
+        uint QRCodeSize = QRCodeImage->width();
+
+        //painter.scale(1/scale, 1/scale);
+        painter.resetTransform();
+
+        switch(configWidget->get_QRCodePosition())
+        {
+        case config::QRPosTopLeft:
+            x = distance;
+            y = distance;
+            break;
+        case config::QRPosTopCenter:
+            x = scaledImageWidth/2 - QRCodeSize/2;
+            y = distance;
+            break;
+        case config::QRPosTopRight:
+            x = scaledImageWidth - QRCodeSize - distance;
+            y = distance;
+            break;
+        case config::QRPosCenterLeft:
+            x = distance;
+            y = scaledImageHeight/2 - QRCodeSize/2;
+            break;
+        case config::QRPosCenterCenter:
+            x = scaledImageWidth/2 - QRCodeSize/2;
+            y = scaledImageHeight/2 - QRCodeSize/2;
+            break;
+        case config::QRPosCenterRight:
+            x = scaledImageWidth - QRCodeSize - distance;
+            y = scaledImageHeight/2 - QRCodeSize/2;
+            break;
+        case config::QRPosBottomLeft:
+            x = distance;
+            y = scaledImageHeight - QRCodeSize - distance;
+            break;
+        case config::QRPosBottomCenter:
+            x = scaledImageWidth/2 - QRCodeSize/2;
+            y = scaledImageHeight - QRCodeSize - distance;
+            break;
+        case config::QRPosBottomRight:
+            x = scaledImageWidth - QRCodeSize - distance;
+            y = scaledImageHeight - QRCodeSize - distance;
+            break;
+        case config::QRPosOutsideTop:
+            x = scaledImageWidth + distance;
+            y = distance;
+            break;
+        case config::QRPosOutsideCenter:
+            x = scaledImageWidth + distance;
+            y = scaledImageHeight/2 - QRCodeSize/2 - distance;
+            break;
+        case config::QRPosOutsideBottom:
+            x = scaledImageWidth + distance;
+            y = scaledImageHeight - QRCodeSize - distance;
+            break;
+        default:
+            x = distance;
+            y = distance;
+            break;
+        }
+
+        //QImage QRCodeImage = configWidget->get_QRCodeImage()->scaledToHeight(printer->pageRect().height()-20);
+        //painter.drawImage(QPoint(10 + img.width()*scale,10),QRCodeImage);
+
+        painter.drawImage(QPoint(x ,y),*QRCodeImage);
+    }
+
 
     painter.end();
 }
