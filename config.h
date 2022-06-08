@@ -34,7 +34,26 @@ public:
     uint get_printActiveTimeout();
 
     bool get_externalPrintEnable();
+
+    bool get_QRCodeEnabled();
     QImage* get_QRCodeImage();
+    enum QRCodePosition{
+        QRPosTopLeft,
+        QRPosTopCenter,
+        QRPosTopRight,
+        QRPosCenterLeft,
+        QRPosCenterCenter,
+        QRPosCenterRight,
+        QRPosBottomLeft,
+        QRPosBottomCenter,
+        QRPosBottomRight,
+        QRPosOutsideTop,
+        QRPosOutsideCenter,
+        QRPosOutsideBottom
+    };
+    enum QRCodePosition get_QRCodePosition();
+    uint get_QRCodeDistance();
+
 
     bool script_prePrint(QString filename, bool blocking=false);
     bool script_externalPrint(QString filename, bool blocking=true);
@@ -82,6 +101,7 @@ private:
     // QRCode things:
     void updateQrCode( QString text );
     QImage* QRCodeImage;
+    void set_QRCodePosition(enum QRCodePosition);
 
     // External Script
     bool executeExternal(QString filename, QStringList arguments, bool blocking );
@@ -91,5 +111,9 @@ signals:
 
 
 };
+
+
+
+
 
 #endif // CONFIG_H

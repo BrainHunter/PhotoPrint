@@ -139,6 +139,33 @@ void config::loadSettings()
         ui->directoryLocalCopyEdit->setText(LocalCopyDirectory);
      }
 
+     // QR Code
+     bool QRCodeEnabled = settings.value("QRCode/QRCodeEnabled", "false").toBool();
+     if (ui->QRCodeEnableCheckBox)
+     {
+        ui->QRCodeEnableCheckBox->setChecked(QRCodeEnabled);
+     }
+     QString QRCodeLink = settings.value("QRCode/QRCodeLink", "https://github.com/BrainHunter/PhotoPrint").toString();
+     if (ui->QRCodeLinkEdit)
+     {
+        ui->QRCodeLinkEdit->setText(QRCodeLink);
+     }
+     uint QRCodeSize = settings.value("QRCode/QRCodeSize", "160").toUInt();
+     if (ui->QRCodeSizeSpinBox)
+     {
+        ui->QRCodeSizeSpinBox->setValue(QRCodeSize);
+     }
+     uint QRCodeDistance = settings.value("QRCode/QRCodeDistance", "30").toUInt();
+     if (ui->QRCodeDistanceSpinBox)
+     {
+        ui->QRCodeDistanceSpinBox->setValue(QRCodeDistance);
+     }
+
+     uint QRCodePosition = settings.value("QRCode/QRCodePosition", "0").toUInt();
+     if (ui->QRPosTopLeftRadioButton)
+     {
+        set_QRCodePosition((config::QRCodePosition)QRCodePosition);
+     }
 
      // update ui
      setPrinterUi();
@@ -180,6 +207,16 @@ void config::saveSettings()
      settings.setValue("LocalCopyEnabled", ui->localCopyEnableCheckBox->isChecked());
      settings.setValue("LocalCopyDirectory", ui->directoryLocalCopyEdit->text());
      settings.endGroup();
+
+     // QR Code
+     settings.beginGroup("QRCode");
+     settings.setValue("QRCodeEnabled", ui->QRCodeEnableCheckBox->isChecked());
+     settings.setValue("QRCodeLink", ui->QRCodeLinkEdit->text());
+     settings.setValue("QRCodeSize", ui->QRCodeSizeSpinBox->value());
+     settings.setValue("QRCodeDistance", ui->QRCodeDistanceSpinBox->value());
+     settings.setValue("QRCodePosition", get_QRCodePosition());
+     settings.endGroup();
+
 }
 
 void config::on_saveButton_clicked()
@@ -268,6 +305,7 @@ void config::setPrinterUi()
     default:
         ui->PortraitRadioButton->setChecked(false);
         ui->landscapeRadioButton->setChecked(false);
+        qWarning() << "printer orrientation not set correctly: " << printer->orientation();
     }
 
     qDebug() << "pageRect( )" <<printer->pageRect();
@@ -512,9 +550,71 @@ void config::on_QRCodeLinkEdit_textChanged(const QString &arg1)
 
 QImage *config::get_QRCodeImage()
 {
+    static QImage img;
+    int size = ui->QRCodeSizeSpinBox->value();
     if(QRCodeImage == NULL)
     {
         updateQrCode(ui->QRCodeLinkEdit->text());
     }
-    return QRCodeImage;
+    img = QRCodeImage->scaled(size,size,Qt::KeepAspectRatio,Qt::FastTransformation);
+    return &img;
+}
+
+config::QRCodePosition config::get_QRCodePosition()
+{
+    if(ui->QRPosTopLeftRadioButton->isChecked())        return QRPosTopLeft;
+    if(ui->QRPosTopCenterRadioButton->isChecked())      return QRPosTopCenter;
+    if(ui->QRPosTopRightRadioButton->isChecked())       return QRPosTopRight;
+    if(ui->QRPosCenterLeftRadioButton->isChecked())     return QRPosCenterLeft;
+    if(ui->QRPosCenterCenterRadioButton->isChecked())   return QRPosCenterCenter;
+    if(ui->QRPosCenterRightRadioButton->isChecked())    return QRPosCenterRight;
+    if(ui->QRPosBottomLeftRadioButton->isChecked())     return QRPosBottomLeft;
+    if(ui->QRPosBottomCenterRadioButton->isChecked())   return QRPosBottomCenter;
+    if(ui->QRPosBottomRightRadioButton->isChecked())    return QRPosBottomRight;
+    if(ui->QRPosOutsideTopRadioButton->isChecked())     return QRPosOutsideTop;
+    if(ui->QRPosOutsideCenterRadioButton->isChecked())  return QRPosOutsideCenter;
+    if(ui->QRPosOutsideBottomRadioButton->isChecked())  return QRPosOutsideBottom;
+    return QRPosTopLeft;
+}
+
+void config::set_QRCodePosition(config::QRCodePosition pos)
+{
+    switch(pos)
+    {
+    case QRPosTopLeft: ui->QRPosTopLeftRadioButton->setChecked(true);
+        break;
+    case QRPosTopCenter: ui->QRPosTopCenterRadioButton->setChecked(true);
+        break;
+    case QRPosTopRight: ui->QRPosTopRightRadioButton->setChecked(true);
+        break;
+    case QRPosCenterLeft: ui->QRPosCenterLeftRadioButton->setChecked(true);
+        break;
+    case QRPosCenterCenter: ui->QRPosCenterCenterRadioButton->setChecked(true);
+        break;
+    case QRPosCenterRight: ui->QRPosCenterRightRadioButton->setChecked(true);
+        break;
+    case QRPosBottomLeft: ui->QRPosBottomLeftRadioButton->setChecked(true);
+        break;
+    case QRPosBottomCenter: ui->QRPosBottomCenterRadioButton->setChecked(true);
+        break;
+    case QRPosBottomRight: ui->QRPosBottomRightRadioButton->setChecked(true);
+        break;
+    case QRPosOutsideTop: ui->QRPosOutsideTopRadioButton->setChecked(true);
+        break;
+    case QRPosOutsideCenter: ui->QRPosOutsideCenterRadioButton->setChecked(true);
+        break;
+    case QRPosOutsideBottom: ui->QRPosOutsideBottomRadioButton->setChecked(true);
+        break;
+    default: ui->QRPosTopLeftRadioButton->setChecked(true);
+    }
+}
+
+bool config::get_QRCodeEnabled()
+{
+    return ui->QRCodeEnableCheckBox->isChecked();
+}
+
+uint config::get_QRCodeDistance()
+{
+    return ui->QRCodeDistanceSpinBox->value();
 }
