@@ -108,6 +108,12 @@ void config::loadSettings()
          printer->setOrientation(QPrinter::Portrait);
      }
 
+     bool PrintPreviewEnabled = settings.value("Printer/PrintPreviewEnabled", "false").toBool();
+     if (ui->PrintPreviewCheckBox)
+     {
+        ui->PrintPreviewCheckBox->setChecked(PrintPreviewEnabled);
+     }
+
      uint printActiveTimeout = settings.value("PrintActiveTimeout", "5").toUInt();
      if (ui->printActiveTimeoutSpinBox)
      {
@@ -193,8 +199,10 @@ void config::saveSettings()
      settings.beginGroup("Printer");
      settings.setValue("PrinterName", printer->printerName());
      settings.setValue("PrinterOrientation",printer->orientation());
+     settings.setValue("PrintPreviewEnabled",ui->PrintPreviewCheckBox->isChecked());
      settings.endGroup();     
      settings.setValue("PrintActiveTimeout",ui->printActiveTimeoutSpinBox->value());
+
 
      //thumbnail view settings:
      settings.beginGroup("ThumbnailView");
@@ -360,7 +368,10 @@ bool config::get_externalPrintEnable()
     return ui->externalPrintCheckBox->isChecked();
 }
 
-
+bool config::get_printPreviewEnabled()
+{
+    return ui->PrintPreviewCheckBox->isChecked();
+}
 
 //// ------------------- Script thingies ---------------
 ///

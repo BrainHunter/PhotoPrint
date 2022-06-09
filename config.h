@@ -34,6 +34,7 @@ public:
     uint get_printActiveTimeout();
 
     bool get_externalPrintEnable();
+    bool get_printPreviewEnabled();
 
     bool get_QRCodeEnabled();
     QImage* get_QRCodeImage();

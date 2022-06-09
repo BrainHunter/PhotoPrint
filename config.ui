@@ -58,7 +58,7 @@
     <enum>QTabWidget::Triangular</enum>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="PrinterSettingsTab">
     <attribute name="title">
@@ -245,6 +245,22 @@
      </property>
      <property name="text">
       <string>Show Print Active for</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="PrintPreviewCheckBox">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>20</y>
+       <width>121</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show a print preview for printer setup&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Show Print Preview</string>
      </property>
     </widget>
    </widget>

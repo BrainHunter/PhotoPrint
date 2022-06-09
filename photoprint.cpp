@@ -583,7 +583,7 @@ void PhotoPrint::on_printButton_clicked()
                 QPrinter* printer = configWidget->get_Printer();
                 qDebug() << "printer state" << printer->printerState();
 
-                bool preview = 1;
+                bool preview = configWidget->get_printPreviewEnabled();
 
                 if(preview)
                 {
@@ -606,10 +606,10 @@ void PhotoPrint::on_printButton_clicked()
 void PhotoPrint::PaintPage(QPrinter* printer){
     QImage img = selectedImageItem->getImage();
     QPainter painter(printer);
-    //double xscale = printer->pageRect().width() / double(img.width());
-    //double yscale = printer->pageRect().height() / double(img.height());
-    double xscale = printer->paperRect().width() / double(img.width());
-    double yscale = printer->paperRect().height() / double(img.height());
+    double xscale = printer->pageRect().width() / double(img.width());
+    double yscale = printer->pageRect().height() / double(img.height());
+    //double xscale = printer->paperRect().width() / double(img.width());
+    //double yscale = printer->paperRect().height() / double(img.height());
     double scale = qMin(xscale, yscale);
     qDebug() << "pageRect().width " << printer->pageRect().width() << " pageRect().height " << printer->pageRect().height();
     qDebug() << "img.width " << img.width()<< " img.height " << img.height();
@@ -630,7 +630,6 @@ void PhotoPrint::PaintPage(QPrinter* printer){
         QImage* QRCodeImage = configWidget->get_QRCodeImage();
         uint QRCodeSize = QRCodeImage->width();
 
-        //painter.scale(1/scale, 1/scale);
         painter.resetTransform();
 
         switch(configWidget->get_QRCodePosition())
@@ -677,7 +676,7 @@ void PhotoPrint::PaintPage(QPrinter* printer){
             break;
         case config::QRPosOutsideCenter:
             x = scaledImageWidth + distance;
-            y = scaledImageHeight/2 - QRCodeSize/2 - distance;
+            y = scaledImageHeight/2 - QRCodeSize/2;
             break;
         case config::QRPosOutsideBottom:
             x = scaledImageWidth + distance;
