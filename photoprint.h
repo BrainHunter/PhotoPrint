@@ -47,6 +47,7 @@ private slots:
     void on_listWidget_itemChanged(QListWidgetItem *item);
     void fileSystemUpdated(QString string);
     void fileCopyFinished(QString destinationFile);
+    void watcherRestartTimerTimeout();
 
     void on_printButton_clicked();
 
@@ -83,6 +84,7 @@ private:
     bool checkForNewImages(QString path);
     void addNewImage(QString file);
     QFileSystemWatcher* watcher;
+    QTimer* watcherRestartTimer;
 
     //Timer for Printactive message
     QTimer* printActiveTimer;

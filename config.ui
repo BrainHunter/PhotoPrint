@@ -989,6 +989,19 @@
     </item>
    </layout>
   </widget>
+  <widget class="QLabel" name="label_18">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>420</y>
+     <width>47</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>V2</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

@@ -11,6 +11,7 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     , configWidget(new config)
     , imgView(new ImageView(this))
     , printActiveView(new ImageView(this))
+    , watcherRestartTimer(new QTimer(this))
     , printActiveTimer(new QTimer(this))
     , thumbnailScrollDownTimer(new QTimer(this))
 {
@@ -82,6 +83,9 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     // ----- File System checker -----
     watcher = new QFileSystemWatcher(this);
     connect(watcher,SIGNAL(directoryChanged(QString)),this,SLOT(fileSystemUpdated(QString)));
+
+    watcherRestartTimer->setSingleShot(true);
+    connect(watcherRestartTimer,SIGNAL(timeout()),this,SLOT(watcherRestartTimerTimeout()));
 
     // --------  Buttons: --------
     // ---- printButton ----
@@ -473,6 +477,7 @@ void PhotoPrint::keyPressEvent(QKeyEvent *event)
     {
         case Qt::Key_Escape:
             watcher->removePaths(watcher->directories());
+            watcherRestartTimer->stop();
             set_View(viewConfig);
             break;
         default:
@@ -525,7 +530,42 @@ void PhotoPrint::on_listWidget_itemClicked(QListWidgetItem *item)
 
 void PhotoPrint::fileSystemUpdated(QString string){
     qInfo() << "Directory has changed! " + string;
-    checkForNewImages(configWidget->get_Image_Path());
+    qDebug() << "watcher->dir " << watcher->directories();
+
+    //check if the directory still exists:
+    QFileInfo testDir(configWidget->get_Image_Path());
+    qDebug() << "exists" << testDir.exists() << " isDir" << testDir.isDir()<< " is readable" << testDir.isReadable();
+
+    if(testDir.exists() && testDir.isDir() && testDir.isReadable())
+    {
+        checkForNewImages(configWidget->get_Image_Path());
+    }
+    else
+    {
+        qWarning() << testDir.absoluteFilePath() << " is not available!";
+        watcherRestartTimer->start(10000);
+    }
+
+}
+
+void PhotoPrint::watcherRestartTimerTimeout()
+{
+    qWarning() << "trying to add the path again ";
+    if(!watcher->directories().isEmpty())
+    {
+        // remove all paths from watcher
+        watcher->removePaths(watcher->directories());
+    }
+    if(watcher->addPath(configWidget->get_Image_Path()))
+    {
+        fileSystemUpdated(configWidget->get_Image_Path());
+    }
+    else
+    {
+        qWarning() << " could not add the path again " << configWidget->get_Image_Path() ;
+        watcherRestartTimer->start(10000);
+    }
+
 }
 
 void PhotoPrint::on_listWidget_itemChanged(QListWidgetItem *item)
