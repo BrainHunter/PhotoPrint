@@ -180,6 +180,7 @@ PhotoPrint::PhotoPrint(QWidget *parent)
 
     // ---- set default view ----
     set_View(viewConfig);
+    this->resize(configWidget->size());
 
     // autostart
     if(configWidget->get_autostart())
