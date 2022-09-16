@@ -55,6 +55,11 @@ public:
     enum QRCodePosition get_QRCodePosition();
     uint get_QRCodeDistance();
 
+    //Image Overlay things:
+    bool get_OverlayEnabled();
+    QImage* get_OverlayImage();
+    enum QRCodePosition get_OverlayPosition();
+    uint get_OverlayDistance();
 
     bool script_prePrint(QString filename, bool blocking=false);
     bool script_externalPrint(QString filename, bool blocking=true);
@@ -85,6 +90,10 @@ private slots:
 
     void on_QRCodeLinkEdit_textChanged(const QString &arg1);
 
+    void on_OverlayBrowseButton_clicked();
+
+    void on_OverlayEnableCheckBox_clicked(bool checked);
+
 private:
     Ui::config *ui;
     void SetReadOnly(QRadioButton* RadioButton, bool readOnly);
@@ -103,6 +112,11 @@ private:
     void updateQrCode( QString text );
     QImage* QRCodeImage;
     void set_QRCodePosition(enum QRCodePosition);
+
+    // Image Overlay things:
+    QImage OverlayImage;
+    bool loadOverlayImage(bool noerror = false);
+    void set_OverlayPosition(enum QRCodePosition);
 
     // External Script
     bool executeExternal(QString filename, QStringList arguments, bool blocking );

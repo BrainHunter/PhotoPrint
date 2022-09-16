@@ -1,6 +1,7 @@
 #include "config.h"
 #include "ui_config.h"
 
+
 #include <QPrinter>
 #include <QPrintDialog>
 #include <QPrinterInfo>
@@ -29,6 +30,7 @@ config::config(QWidget *parent) :
     SetReadOnly(ui->landscapeRadioButton, true);
     SetReadOnly(ui->PortraitRadioButton, true);
 
+    loadOverlayImage(true);
 
 }
 
@@ -173,6 +175,33 @@ void config::loadSettings()
         set_QRCodePosition((config::QRCodePosition)QRCodePosition);
      }
 
+     // Overlay image
+     bool OverlayEnabled = settings.value("OverlayImage/OverlayEnabled", "false").toBool();
+     if(ui->OverlayEnableCheckBox)
+     {
+         ui->OverlayEnableCheckBox->setChecked(OverlayEnabled);
+     }
+     QString OverlayPath = settings.value("OverlayImage/OverlayPath", "overlays/PhotoPrint.png").toString();
+     if (ui->OverlayPathEdit)
+     {
+        ui->OverlayPathEdit->setText(OverlayPath);
+     }
+     uint OverlaySize = settings.value("OverlayImage/OverlaySize", "160").toUInt();
+     if (ui->OverlaySizeSpinBox)
+     {
+        ui->OverlaySizeSpinBox->setValue(OverlaySize);
+     }
+     uint OverlayDistance = settings.value("OverlayImage/OverlayDistance", "30").toUInt();
+     if (ui->OverlayDistanceSpinBox)
+     {
+        ui->OverlayDistanceSpinBox->setValue(OverlayDistance);
+     }
+     uint OverlayPosition = settings.value("OverlayImage/OverlayPosition", "0").toUInt();
+     if (ui->OverlayPosTopLeftRadioButton)
+     {
+        set_OverlayPosition((config::QRCodePosition)OverlayPosition);
+     }
+
      // update ui
      setPrinterUi();
 }
@@ -223,6 +252,15 @@ void config::saveSettings()
      settings.setValue("QRCodeSize", ui->QRCodeSizeSpinBox->value());
      settings.setValue("QRCodeDistance", ui->QRCodeDistanceSpinBox->value());
      settings.setValue("QRCodePosition", get_QRCodePosition());
+     settings.endGroup();
+
+     //Overlay Image
+     settings.beginGroup("OverlayImage");
+     settings.setValue("OverlayEnabled", ui->OverlayEnableCheckBox->isChecked());
+     settings.setValue("OverlayPath", ui->OverlayPathEdit->text());
+     settings.setValue("OverlaySize", ui->OverlaySizeSpinBox->value());
+     settings.setValue("OverlayDistance", ui->OverlayDistanceSpinBox->value());
+     settings.setValue("OverlayPosition", get_OverlayPosition());
      settings.endGroup();
 
 }
@@ -628,4 +666,131 @@ bool config::get_QRCodeEnabled()
 uint config::get_QRCodeDistance()
 {
     return ui->QRCodeDistanceSpinBox->value();
+}
+
+
+//// ------------------- Image Overlay thingies ---------------
+///
+///
+///
+///
+///
+
+
+void config::on_OverlayBrowseButton_clicked()
+{
+    QUrl newPath = QFileDialog::getOpenFileName(this, tr("Open Overlay Image File"), ui->OverlayPathEdit->text(),tr("Images (*.bmp *.png *.xpm *.jpg)"));
+    ui->OverlayPathEdit->setText(newPath.toString());
+
+    // try to get
+    if(loadOverlayImage())
+    {
+        // get the image size and make suggestion on the gui
+        QSize imgSize = OverlayImage.size();
+        int maxSize = std::max(imgSize.width(), imgSize.height());
+        ui->OverlaySizeSpinBox->setValue(maxSize);
+    }
+
+
+}
+
+bool config::get_OverlayEnabled()
+{
+    return ui->OverlayEnableCheckBox->isChecked();
+}
+
+bool config::loadOverlayImage(bool noerror)
+{
+    //try to load the image;
+    OverlayImage.load(ui->OverlayPathEdit->text());
+    if(OverlayImage.isNull())
+    {
+        if(noerror) // we do not want a error on startup of the programm
+        {
+        QMessageBox::warning(this, tr("unable to load image"),
+                            tr("Unable to load the overlay image with the given path"),
+                            QMessageBox::Ok );
+        }
+        return false;
+    }
+    ui->OverlayLabel->setPixmap( QPixmap::fromImage(OverlayImage.scaled(160,160,Qt::KeepAspectRatio,Qt::FastTransformation),Qt::AutoColor) );
+    return true;
+}
+
+QImage* config::get_OverlayImage()
+{
+    int size = ui->OverlaySizeSpinBox->value();
+
+    //check if the image needs to be resized:
+    if(OverlayImage.size().width() != size && OverlayImage.size().height() != size )
+    {
+        //resize
+        qInfo() << "Resizing the overlay image";
+        OverlayImage = OverlayImage.scaled(size,size,Qt::KeepAspectRatio,Qt::FastTransformation);
+    }
+
+    return &OverlayImage;
+}
+
+config::QRCodePosition config::get_OverlayPosition()
+{
+
+    if(ui->OverlayPosTopLeftRadioButton->isChecked())        return QRPosTopLeft;
+    if(ui->OverlayPosTopCenterRadioButton->isChecked())      return QRPosTopCenter;
+    if(ui->OverlayPosTopRightRadioButton->isChecked())       return QRPosTopRight;
+    if(ui->OverlayPosCenterLeftRadioButton->isChecked())     return QRPosCenterLeft;
+    if(ui->OverlayPosCenterCenterRadioButton->isChecked())   return QRPosCenterCenter;
+    if(ui->OverlayPosCenterRightRadioButton->isChecked())    return QRPosCenterRight;
+    if(ui->OverlayPosBottomLeftRadioButton->isChecked())     return QRPosBottomLeft;
+    if(ui->OverlayPosBottomCenterRadioButton->isChecked())   return QRPosBottomCenter;
+    if(ui->OverlayPosBottomRightRadioButton->isChecked())    return QRPosBottomRight;
+    if(ui->OverlayPosOutsideTopRadioButton->isChecked())     return QRPosOutsideTop;
+    if(ui->OverlayPosOutsideCenterRadioButton->isChecked())  return QRPosOutsideCenter;
+    if(ui->OverlayPosOutsideBottomRadioButton->isChecked())  return QRPosOutsideBottom;
+    return QRPosTopLeft;
+}
+
+void config::set_OverlayPosition(config::QRCodePosition pos)    // yes... one could make a little class for this
+{
+    switch(pos)
+    {
+    case QRPosTopLeft: ui->OverlayPosTopLeftRadioButton->setChecked(true);
+        break;
+    case QRPosTopCenter: ui->OverlayPosTopCenterRadioButton->setChecked(true);
+        break;
+    case QRPosTopRight: ui->OverlayPosTopRightRadioButton->setChecked(true);
+        break;
+    case QRPosCenterLeft: ui->OverlayPosCenterLeftRadioButton->setChecked(true);
+        break;
+    case QRPosCenterCenter: ui->OverlayPosCenterCenterRadioButton->setChecked(true);
+        break;
+    case QRPosCenterRight: ui->OverlayPosCenterRightRadioButton->setChecked(true);
+        break;
+    case QRPosBottomLeft: ui->OverlayPosBottomLeftRadioButton->setChecked(true);
+        break;
+    case QRPosBottomCenter: ui->OverlayPosBottomCenterRadioButton->setChecked(true);
+        break;
+    case QRPosBottomRight: ui->OverlayPosBottomRightRadioButton->setChecked(true);
+        break;
+    case QRPosOutsideTop: ui->OverlayPosOutsideTopRadioButton->setChecked(true);
+        break;
+    case QRPosOutsideCenter: ui->OverlayPosOutsideCenterRadioButton->setChecked(true);
+        break;
+    case QRPosOutsideBottom: ui->OverlayPosOutsideBottomRadioButton->setChecked(true);
+        break;
+    default: ui->OverlayPosTopLeftRadioButton->setChecked(true);
+    }
+}
+
+uint config::get_OverlayDistance()
+{
+    return ui->OverlayDistanceSpinBox->value();
+}
+
+void config::on_OverlayEnableCheckBox_clicked(bool checked)
+{
+    if(checked)
+    {
+        loadOverlayImage();
+    }
 }
