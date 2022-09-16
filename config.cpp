@@ -27,7 +27,7 @@ config::config(QWidget *parent) :
     qInfo() << settingsFile;
 
     SetReadOnly(ui->landscapeRadioButton, true);
-    SetReadOnly(ui->landscapeRadioButton, true);
+    SetReadOnly(ui->PortraitRadioButton, true);
 
 
 }
