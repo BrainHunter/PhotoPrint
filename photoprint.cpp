@@ -468,7 +468,7 @@ void PhotoPrint::start()
     }
 
     watcher->addPath(configWidget->get_Image_Path());
-
+    watcherRestartTimer->start(120000); // watchdog for watcher
 }
 
 void PhotoPrint::keyPressEvent(QKeyEvent *event)
@@ -545,7 +545,10 @@ void PhotoPrint::fileSystemUpdated(QString string){
 
     if(testDir.exists() && testDir.isDir() && testDir.isReadable())
     {
-        checkForNewImages(configWidget->get_Image_Path());
+        if(checkForNewImages(configWidget->get_Image_Path()))
+        {
+            watcherRestartTimer->start(120000);  // restart the 120sec - normal operation - since we just got a new image
+        }
     }
     else
     {
@@ -557,7 +560,7 @@ void PhotoPrint::fileSystemUpdated(QString string){
 
 void PhotoPrint::watcherRestartTimerTimeout()
 {
-    qWarning() << "trying to add the path again ";
+    qWarning() << QTime::currentTime().toString() << "trying to add the path again ";
     if(!watcher->directories().isEmpty())
     {
         // remove all paths from watcher
@@ -566,13 +569,13 @@ void PhotoPrint::watcherRestartTimerTimeout()
     if(watcher->addPath(configWidget->get_Image_Path()))
     {
         fileSystemUpdated(configWidget->get_Image_Path());
+        watcherRestartTimer->start(120000);  // 120sec - normal operation - just in case
     }
     else
     {
-        qWarning() << " could not add the path again " << configWidget->get_Image_Path() ;
-        watcherRestartTimer->start(10000);
+        qWarning() << "could not add the path again " << configWidget->get_Image_Path() ;
+        watcherRestartTimer->start(10000);  //10sec
     }
-
 }
 
 void PhotoPrint::on_listWidget_itemChanged(QListWidgetItem *item)
