@@ -221,7 +221,13 @@ bool PhotoPrint::checkForNewImages(QString path)
 
             if(!imageMap.contains(dstFile))
             {
-                // check if dst file is allready copied:
+                // if copy is already running - do noting, this function is called again when running file copy is finished
+                if(FileCopyRunner::isRunning()) //there might be a short time when running is false but finished signal is not emitted. so there is a chance that two copy processes get started.
+                {
+                    break;
+                }
+
+                // check if dst file is already copied:
                 if(QFile::exists(dstFile))
                 {
                     addNewImage(dstFile);
@@ -229,17 +235,11 @@ bool PhotoPrint::checkForNewImages(QString path)
                     continue;
                 }
 
-                // TODO : check if another runner is active
-                if(! FileCopyRunner::isRunning()) //there might be a short time when running is false but finished signal is not emitted. so there is a chance that two copy processes get started.
-                {
-                    FileCopyRunner *runner = new FileCopyRunner(tmp, dstFile);  // do not set parent of runner thread as emit will fail
-                    QObject::connect(runner, SIGNAL(finished(QString)), this, SLOT(fileCopyFinished(QString)),Qt::QueuedConnection);
-                    QThreadPool::globalInstance()->start(runner);
-                }
-                else
-                {
-                    break;
-                }
+                // Start the file copy runner:
+                FileCopyRunner *runner = new FileCopyRunner(tmp, dstFile);  // do not set parent of runner thread as emit will fail
+                QObject::connect(runner, SIGNAL(finished(QString)), this, SLOT(fileCopyFinished(QString)),Qt::QueuedConnection);
+                QThreadPool::globalInstance()->start(runner);
+
                 // only start one copy at a time
                 // if there are more files to be copied over, this function will be called again by the fileCopyFinished slot
                 ret = true;
@@ -272,6 +272,12 @@ void PhotoPrint::fileCopyFinished(QString destinationFile)
 
 void PhotoPrint::addNewImage(QString file)
 {
+    if(imageMap.contains(file))
+    {
+        qWarning() << "add new image is called with file alread in map: " << file;
+        return;
+    }
+
     ImageItem *it;
     it = new ImageItem(file, configWidget->get_ThumbnailSize());
 
