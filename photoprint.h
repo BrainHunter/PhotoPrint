@@ -53,6 +53,8 @@ private slots:
 
     void printActiveTimerTimeout();
     void PaintPage(QPrinter* printer);
+    //void PainterAction(QPainter* painter, int w, int h, bool );
+    void PaintOverlay(QPainter* painter, QImage* Image, uint distance, enum config::QRCodePosition pos );
 
     void on_backButton_clicked();
 

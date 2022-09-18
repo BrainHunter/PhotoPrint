@@ -660,169 +660,130 @@ void PhotoPrint::PaintPage(QPrinter* printer){
     double yscale = printer->pageRect().height() / double(img.height());
     //double xscale = printer->paperRect().width() / double(img.width());
     //double yscale = printer->paperRect().height() / double(img.height());
-    double scale = qMin(xscale, yscale);
+    double scale = qMax(xscale, yscale);
     qDebug() << "pageRect().width " << printer->pageRect().width() << " pageRect().height " << printer->pageRect().height();
     qDebug() << "img.width " << img.width()<< " img.height " << img.height();
     qDebug() << "scale " << scale;
+    uint scaledImageWidth = img.width()*scale;
+    uint scaledImageHeight = img.height()*scale;
+    qDebug() << "scaled Image size " << scaledImageWidth << "x" << scaledImageHeight;
     //painter.translate(printer->paperRect().x() + printer->pageRect().width() / 2,
     //                    printer->paperRect().y() + printer->pageRect().height() / 2);
     painter.scale(scale, scale);
     //painter.translate(-width() / 2, -height() / 2);
-    painter.drawImage(QPoint(0,0),img);
+
+    int printerWidth = printer->pageRect().width();
+    int printerHeight = printer->pageRect().height();
+
+    int x = (printerWidth - (int)scaledImageWidth) /2;
+    int y = (printerHeight - (int)scaledImageHeight) /2;
+
+    painter.drawImage(QPoint(x,y),img);
 
     // draw QRCode
     if(configWidget->get_QRCodeEnabled())
     {
-        uint scaledImageWidth = img.width()*scale;
-        uint scaledImageHeight = img.height()*scale;
-        uint x=0,y=0;
-        uint distance = configWidget->get_QRCodeDistance(); // distance from border
-        QImage* QRCodeImage = configWidget->get_QRCodeImage();
-        uint QRCodeSize = QRCodeImage->width();
-
-        painter.resetTransform();
-
-        switch(configWidget->get_QRCodePosition())
-        {
-        case config::QRPosTopLeft:
-            x = distance;
-            y = distance;
-            break;
-        case config::QRPosTopCenter:
-            x = scaledImageWidth/2 - QRCodeSize/2;
-            y = distance;
-            break;
-        case config::QRPosTopRight:
-            x = scaledImageWidth - QRCodeSize - distance;
-            y = distance;
-            break;
-        case config::QRPosCenterLeft:
-            x = distance;
-            y = scaledImageHeight/2 - QRCodeSize/2;
-            break;
-        case config::QRPosCenterCenter:
-            x = scaledImageWidth/2 - QRCodeSize/2;
-            y = scaledImageHeight/2 - QRCodeSize/2;
-            break;
-        case config::QRPosCenterRight:
-            x = scaledImageWidth - QRCodeSize - distance;
-            y = scaledImageHeight/2 - QRCodeSize/2;
-            break;
-        case config::QRPosBottomLeft:
-            x = distance;
-            y = scaledImageHeight - QRCodeSize - distance;
-            break;
-        case config::QRPosBottomCenter:
-            x = scaledImageWidth/2 - QRCodeSize/2;
-            y = scaledImageHeight - QRCodeSize - distance;
-            break;
-        case config::QRPosBottomRight:
-            x = scaledImageWidth - QRCodeSize - distance;
-            y = scaledImageHeight - QRCodeSize - distance;
-            break;
-        case config::QRPosOutsideTop:
-            x = scaledImageWidth + distance;
-            y = distance;
-            break;
-        case config::QRPosOutsideCenter:
-            x = scaledImageWidth + distance;
-            y = scaledImageHeight/2 - QRCodeSize/2;
-            break;
-        case config::QRPosOutsideBottom:
-            x = scaledImageWidth + distance;
-            y = scaledImageHeight - QRCodeSize - distance;
-            break;
-        default:
-            x = distance;
-            y = distance;
-            break;
-        }
-
-        //QImage QRCodeImage = configWidget->get_QRCodeImage()->scaledToHeight(printer->pageRect().height()-20);
-        //painter.drawImage(QPoint(10 + img.width()*scale,10),QRCodeImage);
-
-        painter.drawImage(QPoint(x ,y),*QRCodeImage);
+        PaintOverlay(&painter,
+                     configWidget->get_QRCodeImage(),
+                     configWidget->get_QRCodeDistance(),
+                     configWidget->get_QRCodePosition());
     }
 
     // draw overlay image:
     if(configWidget->get_OverlayEnabled())
     {
-        uint scaledImageWidth = img.width()*scale;
-        uint scaledImageHeight = img.height()*scale;
-        uint x=0,y=0;
-        uint distance = configWidget->get_OverlayDistance(); // distance from border
-        QImage* OverlayImage = configWidget->get_OverlayImage();
-        uint overlayWidth = OverlayImage->width();
-        uint overlayHeight = OverlayImage->height();
-
-        painter.resetTransform();
-
-        switch(configWidget->get_OverlayPosition())
-        {
-        case config::QRPosTopLeft:
-            x = distance;
-            y = distance;
-            break;
-        case config::QRPosTopCenter:
-            x = scaledImageWidth/2 - overlayWidth/2;
-            y = distance;
-            break;
-        case config::QRPosTopRight:
-            x = scaledImageWidth - overlayWidth - distance;
-            y = distance;
-            break;
-        case config::QRPosCenterLeft:
-            x = distance;
-            y = scaledImageHeight/2 - overlayHeight/2;
-            break;
-        case config::QRPosCenterCenter:
-            x = scaledImageWidth/2 - overlayWidth/2;
-            y = scaledImageHeight/2 - overlayHeight/2;
-            break;
-        case config::QRPosCenterRight:
-            x = scaledImageWidth - overlayWidth - distance;
-            y = scaledImageHeight/2 - overlayHeight/2;
-            break;
-        case config::QRPosBottomLeft:
-            x = distance;
-            y = scaledImageHeight - overlayHeight - distance;
-            break;
-        case config::QRPosBottomCenter:
-            x = scaledImageWidth/2 - overlayWidth/2;
-            y = scaledImageHeight - overlayHeight - distance;
-            break;
-        case config::QRPosBottomRight:
-            x = scaledImageWidth - overlayWidth - distance;
-            y = scaledImageHeight - overlayHeight - distance;
-            break;
-        case config::QRPosOutsideTop:
-            x = scaledImageWidth + distance;
-            y = distance;
-            break;
-        case config::QRPosOutsideCenter:
-            x = scaledImageWidth + distance;
-            y = scaledImageHeight/2 - overlayHeight/2;
-            break;
-        case config::QRPosOutsideBottom:
-            x = scaledImageWidth + distance;
-            y = scaledImageHeight - overlayHeight - distance;
-            break;
-        default:
-            x = distance;
-            y = distance;
-            break;
-        }
-
-        //QImage QRCodeImage = configWidget->get_QRCodeImage()->scaledToHeight(printer->pageRect().height()-20);
-        //painter.drawImage(QPoint(10 + img.width()*scale,10),QRCodeImage);
-
-        painter.drawImage(QPoint(x ,y),*OverlayImage);
+        PaintOverlay(&painter,
+                     configWidget->get_OverlayImage(),
+                     configWidget->get_OverlayDistance(),
+                     configWidget->get_OverlayPosition());
     }
 
 
 
     painter.end();
 }
+
+
+void PhotoPrint::PaintOverlay(QPainter* painter, QImage* Image, uint distance, enum config::QRCodePosition pos )
+
+{
+    QRect r = painter->viewport();
+    qDebug() << "PaintOverlay viewport: " << r;
+    uint scaledImageWidth = r.width();
+    uint scaledImageHeight = r.height();
+    uint x=0,y=0;
+    //uint distance = configWidget->get_QRCodeDistance(); // distance from border
+
+    uint overlayWidth = Image->width();
+    uint overlayHeight = Image->height();
+
+    qDebug() << "overlay image size: " << overlayWidth << "x" <<overlayHeight ;
+
+    painter->resetTransform();
+
+    switch(pos)
+    {
+    case config::QRPosTopLeft:
+        x = distance;
+        y = distance;
+        break;
+    case config::QRPosTopCenter:
+        x = scaledImageWidth/2 - overlayWidth/2;
+        y = distance;
+        break;
+    case config::QRPosTopRight:
+        x = scaledImageWidth - overlayWidth - distance;
+        y = distance;
+        break;
+    case config::QRPosCenterLeft:
+        x = distance;
+        y = scaledImageHeight/2 - overlayHeight/2;
+        break;
+    case config::QRPosCenterCenter:
+        x = scaledImageWidth/2 - overlayWidth/2;
+        y = scaledImageHeight/2 - overlayHeight/2;
+        break;
+    case config::QRPosCenterRight:
+        x = scaledImageWidth - overlayWidth - distance;
+        y = scaledImageHeight/2 - overlayHeight/2;
+        break;
+    case config::QRPosBottomLeft:
+        x = distance;
+        y = scaledImageHeight - overlayHeight - distance;
+        break;
+    case config::QRPosBottomCenter:
+        x = scaledImageWidth/2 - overlayWidth/2;
+        y = scaledImageHeight - overlayHeight - distance;
+        break;
+    case config::QRPosBottomRight:
+        x = scaledImageWidth - overlayWidth - distance;
+        y = scaledImageHeight - overlayHeight - distance;
+        break;
+    case config::QRPosOutsideTop:
+        x = scaledImageWidth + distance;
+        y = distance;
+        break;
+    case config::QRPosOutsideCenter:
+        x = scaledImageWidth + distance;
+        y = scaledImageHeight/2 - overlayHeight/2;
+        break;
+    case config::QRPosOutsideBottom:
+        x = scaledImageWidth + distance;
+        y = scaledImageHeight - overlayHeight - distance;
+        break;
+    default:
+        x = distance;
+        y = distance;
+        break;
+    }
+
+    //QImage QRCodeImage = configWidget->get_QRCodeImage()->scaledToHeight(printer->pageRect().height()-20);
+    //painter.drawImage(QPoint(10 + img.width()*scale,10),QRCodeImage);
+
+    painter->drawImage(QPoint(x ,y),*Image);
+
+}
+
 
 void PhotoPrint::printActiveTimerTimeout()
 {
