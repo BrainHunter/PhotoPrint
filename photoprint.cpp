@@ -313,6 +313,9 @@ void PhotoPrint::set_View(ViewEnum e){
         ui->backButton->hide();
         ui->nextButton->hide();
         ui->prevButton->hide();
+        // cancel the timers:
+        printActiveTimer->stop(); // do not jump back to the image view
+
         currentView = viewConfig;
         break;
     case viewThumbnails:
@@ -682,14 +685,8 @@ void PhotoPrint::PaintPage(QPrinter* printer){
     // draw the image at the calculated origin
     painter.drawImage(QPoint(x,y),img);
 
-    // draw QRCode
-    if(configWidget->get_QRCodeEnabled())
-    {
-        PaintOverlay(&painter,
-                     configWidget->get_QRCodeImage(),
-                     configWidget->get_QRCodeDistance(),
-                     configWidget->get_QRCodePosition());
-    }
+    // reset scale
+    painter.resetTransform();
 
     // draw overlay image:
     if(configWidget->get_OverlayEnabled())
@@ -698,6 +695,15 @@ void PhotoPrint::PaintPage(QPrinter* printer){
                      configWidget->get_OverlayImage(),
                      configWidget->get_OverlayDistance(),
                      configWidget->get_OverlayPosition());
+    }
+
+    // draw QRCode
+    if(configWidget->get_QRCodeEnabled())
+    {
+        PaintOverlay(&painter,
+                     configWidget->get_QRCodeImage(),
+                     configWidget->get_QRCodeDistance(),
+                     configWidget->get_QRCodePosition());
     }
 
     painter.end();
@@ -712,14 +718,11 @@ void PhotoPrint::PaintOverlay(QPainter* painter, QImage* Image, uint distance, e
     uint scaledImageWidth = r.width();
     uint scaledImageHeight = r.height();
     uint x=0,y=0;
-    //uint distance = configWidget->get_QRCodeDistance(); // distance from border
 
     uint overlayWidth = Image->width();
     uint overlayHeight = Image->height();
 
     qDebug() << "overlay image size: " << overlayWidth << "x" <<overlayHeight ;
-
-    painter->resetTransform();
 
     switch(pos)
     {
