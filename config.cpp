@@ -110,6 +110,16 @@ void config::loadSettings()
          printer->setOrientation(QPrinter::Portrait);
      }
 
+     QString paperName = settings.value("Printer/PrinterPaperName", "").toString();
+     if(!paperName.isEmpty())
+     {
+        printer->setPaperName(paperName);
+     }
+     else
+     {
+         //printer->setPaperSize(QPagedPaintDevice::A4);
+     }
+
      bool PrintPreviewEnabled = settings.value("Printer/PrintPreviewEnabled", "false").toBool();
      if (ui->PrintPreviewCheckBox)
      {
@@ -228,6 +238,7 @@ void config::saveSettings()
      settings.beginGroup("Printer");
      settings.setValue("PrinterName", printer->printerName());
      settings.setValue("PrinterOrientation",printer->orientation());
+     settings.setValue("PrinterPaperName",printer->paperName());
      settings.setValue("PrintPreviewEnabled",ui->PrintPreviewCheckBox->isChecked());
      settings.endGroup();     
      settings.setValue("PrintActiveTimeout",ui->printActiveTimeoutSpinBox->value());
@@ -367,7 +378,9 @@ void config::setPrinterUi()
     ui->printerTextEdit->setText("");
     ui->printerTextEdit->insertPlainText("paperRect: " + rectToString(printer->paperRect()) + "\n");
     ui->printerTextEdit->insertPlainText("pageRect: " + rectToString(printer->pageRect()) + "\n");
-    ui->printerTextEdit->insertPlainText("resolution: " + QString::number(printer->resolution()) );
+    ui->printerTextEdit->insertPlainText("resolution: " + QString::number(printer->resolution()) + "\n");
+    ui->printerTextEdit->insertPlainText("PaperName: " + printer->paperName() );
+
 }
 
 void config::SetReadOnly(QRadioButton* RadioButton, bool readOnly)
