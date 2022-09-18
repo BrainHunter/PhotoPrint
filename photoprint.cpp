@@ -664,20 +664,22 @@ void PhotoPrint::PaintPage(QPrinter* printer){
     qDebug() << "pageRect().width " << printer->pageRect().width() << " pageRect().height " << printer->pageRect().height();
     qDebug() << "img.width " << img.width()<< " img.height " << img.height();
     qDebug() << "scale " << scale;
+
+    // scaled image size is not used but easier to compare to the page size when debugging
     uint scaledImageWidth = img.width()*scale;
     uint scaledImageHeight = img.height()*scale;
     qDebug() << "scaled Image size " << scaledImageWidth << "x" << scaledImageHeight;
-    //painter.translate(printer->paperRect().x() + printer->pageRect().width() / 2,
-    //                    printer->paperRect().y() + printer->pageRect().height() / 2);
+
+    //scale the painter coordinate system to match the image
     painter.scale(scale, scale);
-    //painter.translate(-width() / 2, -height() / 2);
 
-    int printerWidth = printer->pageRect().width();
-    int printerHeight = printer->pageRect().height();
+    // calculate the origin of the image
+    int printerWidthScaled = printer->pageRect().width()/scale;
+    int printerHeightScaled = printer->pageRect().height()/scale;
+    int x = (printerWidthScaled - img.width()) /2;
+    int y = (printerHeightScaled - img.height()) /2;
 
-    int x = (printerWidth - (int)scaledImageWidth) /2;
-    int y = (printerHeight - (int)scaledImageHeight) /2;
-
+    // draw the image at the calculated origin
     painter.drawImage(QPoint(x,y),img);
 
     // draw QRCode
@@ -697,8 +699,6 @@ void PhotoPrint::PaintPage(QPrinter* printer){
                      configWidget->get_OverlayDistance(),
                      configWidget->get_OverlayPosition());
     }
-
-
 
     painter.end();
 }
@@ -776,9 +776,6 @@ void PhotoPrint::PaintOverlay(QPainter* painter, QImage* Image, uint distance, e
         y = distance;
         break;
     }
-
-    //QImage QRCodeImage = configWidget->get_QRCodeImage()->scaledToHeight(printer->pageRect().height()-20);
-    //painter.drawImage(QPoint(10 + img.width()*scale,10),QRCodeImage);
 
     painter->drawImage(QPoint(x ,y),*Image);
 
