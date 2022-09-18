@@ -523,7 +523,31 @@ void PhotoPrint::on_listWidget_itemClicked(QListWidgetItem *item)
     selectedImageItem = (ImageItem*)item;
     // get the filename:
     try {
-        imgView->setImage(selectedImageItem->getImage());
+        if(configWidget->get_OverlayShowOnPreview() && configWidget->get_OverlayEnabled())
+        {
+            QImage img = selectedImageItem->getImage();
+            QPainter p(&img);
+
+            QRect pRect = configWidget->get_Printer()->pageRect();
+            double xscale = double(img.width()) / pRect.width();
+            double yscale = double(img.height()) / pRect.height();
+            double scale = qMin(xscale, yscale);
+
+            // scale the painter
+            p.scale(scale, scale);
+
+            PaintOverlay(&p, configWidget->get_OverlayImage(),
+                         configWidget->get_OverlayDistance(),
+                         configWidget->get_OverlayPosition(),
+                         scale);
+            p.end();
+            imgView->setImage(img);
+        }
+        else
+        {
+            imgView->setImage(selectedImageItem->getImage());
+        }
+
         imgView->resize(this->size());
     } catch (...) {
         qWarning() << "error loading image" << selectedImageItem->filename;
@@ -710,13 +734,12 @@ void PhotoPrint::PaintPage(QPrinter* printer){
 }
 
 
-void PhotoPrint::PaintOverlay(QPainter* painter, QImage* Image, uint distance, enum config::QRCodePosition pos )
-
+void PhotoPrint::PaintOverlay(QPainter* painter, QImage* Image, uint distance, enum config::QRCodePosition pos , double scale)
 {
     QRect r = painter->viewport();
     qDebug() << "PaintOverlay viewport: " << r;
-    uint scaledImageWidth = r.width();
-    uint scaledImageHeight = r.height();
+    uint scaledImageWidth = r.width()/scale;
+    uint scaledImageHeight = r.height()/scale;
     uint x=0,y=0;
 
     uint overlayWidth = Image->width();

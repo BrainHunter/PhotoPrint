@@ -60,6 +60,7 @@ public:
     QImage* get_OverlayImage();
     enum QRCodePosition get_OverlayPosition();
     uint get_OverlayDistance();
+    bool get_OverlayShowOnPreview();
 
     bool script_prePrint(QString filename, bool blocking=false);
     bool script_externalPrint(QString filename, bool blocking=true);

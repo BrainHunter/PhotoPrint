@@ -211,6 +211,11 @@ void config::loadSettings()
      {
         set_OverlayPosition((config::QRCodePosition)OverlayPosition);
      }
+     bool OverlayShowOnPreview = settings.value("OverlayImage/OverlayShowOnPreview", "false").toBool();
+     if(ui->OverlayShowOnPreviewCheckBox)
+     {
+         ui->OverlayShowOnPreviewCheckBox->setChecked(OverlayShowOnPreview);
+     }
 
      // update ui
      setPrinterUi();
@@ -272,6 +277,7 @@ void config::saveSettings()
      settings.setValue("OverlaySize", ui->OverlaySizeSpinBox->value());
      settings.setValue("OverlayDistance", ui->OverlayDistanceSpinBox->value());
      settings.setValue("OverlayPosition", get_OverlayPosition());
+     settings.setValue("OverlayShowOnPreview", ui->OverlayShowOnPreviewCheckBox->isChecked());
      settings.endGroup();
 
 }
@@ -807,3 +813,9 @@ void config::on_OverlayEnableCheckBox_clicked(bool checked)
         loadOverlayImage();
     }
 }
+
+bool config::get_OverlayShowOnPreview()
+{
+    return ui->OverlayShowOnPreviewCheckBox->isChecked();
+}
+
