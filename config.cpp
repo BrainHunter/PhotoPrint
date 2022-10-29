@@ -724,7 +724,7 @@ bool config::loadOverlayImage(bool noerror)
     OverlayImage.load(ui->OverlayPathEdit->text());
     if(OverlayImage.isNull())
     {
-        if(noerror) // we do not want a error on startup of the programm
+        if(noerror==false) // we do not want a error on startup of the programm
         {
         QMessageBox::warning(this, tr("unable to load image"),
                             tr("Unable to load the overlay image with the given path"),
