@@ -211,7 +211,8 @@ bool PhotoPrint::checkForNewImages(QString path)
 
     while( dirList.length() )
     {
-        QString tmp=dirList.last().absoluteFilePath();
+        QFileInfo lastFile = dirList.last();
+        QString tmp=lastFile.absoluteFilePath();
         dirList.removeLast();
 
         if(configWidget->get_localCopyEnabled())
@@ -221,6 +222,13 @@ bool PhotoPrint::checkForNewImages(QString path)
 
             if(!imageMap.contains(dstFile))
             {
+                // check if file has size != 0
+                if(lastFile.size()==0)
+                {
+                    qDebug() << "File is empty";
+                    break;
+                }
+
                 // if copy is already running - do noting, this function is called again when running file copy is finished
                 if(FileCopyRunner::isRunning()) //there might be a short time when running is false but finished signal is not emitted. so there is a chance that two copy processes get started.
                 {
@@ -238,6 +246,7 @@ bool PhotoPrint::checkForNewImages(QString path)
                 // Start the file copy runner:
                 FileCopyRunner *runner = new FileCopyRunner(tmp, dstFile);  // do not set parent of runner thread as emit will fail
                 QObject::connect(runner, SIGNAL(finished(QString)), this, SLOT(fileCopyFinished(QString)),Qt::QueuedConnection);
+                // QThreadPool deletes the QRunnable automatically by default. //delete will cause disconnect so everything should be fine
                 QThreadPool::globalInstance()->start(runner);
 
                 // only start one copy at a time
