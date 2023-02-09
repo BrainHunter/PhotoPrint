@@ -52,6 +52,7 @@ void FileCopyRunner::run()
             DstFileInfo.refresh();
             if( DstFileInfo.size() == srcFileInfo.size())
             {
+                qInfo() << "File Copy Finished!";
                 emit finished(destinationFile);
             }
             else

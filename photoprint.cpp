@@ -211,19 +211,19 @@ bool PhotoPrint::checkForNewImages(QString path)
 
     while( dirList.length() )
     {
-        QFileInfo lastFile = dirList.last();
-        QString tmp=lastFile.absoluteFilePath();
+        QFileInfo srcFile = dirList.last();
+        QString tmp=srcFile.absoluteFilePath();
         dirList.removeLast();
 
         if(configWidget->get_localCopyEnabled())
         {
-            QFileInfo srcFile(tmp);
+            //QFileInfo srcFile(tmp);
             QString dstFile = configWidget->get_LocalCopyPath() + "//" +  srcFile.fileName();
 
             if(!imageMap.contains(dstFile))
             {
                 // check if file has size != 0
-                if(lastFile.size()==0)
+                if(srcFile.size()==0)
                 {
                     qDebug() << "File is empty";
                     break;
@@ -232,12 +232,19 @@ bool PhotoPrint::checkForNewImages(QString path)
                 // if copy is already running - do noting, this function is called again when running file copy is finished
                 if(FileCopyRunner::isRunning()) //there might be a short time when running is false but finished signal is not emitted. so there is a chance that two copy processes get started.
                 {
+                    qInfo() << "File Copy is runnig: break ";
                     break;
                 }
 
                 // check if dst file is already copied:
                 if(QFile::exists(dstFile))
                 {
+                    QFileInfo DstFileInfo(dstFile);
+                    if( DstFileInfo.size() != srcFile.size())
+                    {
+                        qInfo() << "Destination already exists but is not same size " << tmp;
+                        continue;
+                    }
                     addNewImage(dstFile);
                     ret = true;
                     continue;
