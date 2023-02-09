@@ -100,6 +100,6 @@ private:
     // Timer for automatic return to ThumbnailView down:
     QTimer* returnToThumbnailViewTimer;
 
-
+    void showRemainingPaper();
 };
 #endif // PHOTOPRINT_H

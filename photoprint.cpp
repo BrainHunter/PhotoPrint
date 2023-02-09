@@ -314,6 +314,7 @@ void PhotoPrint::addNewImage(QString file)
 void PhotoPrint::set_View(ViewEnum e){
 
     thumbnailScrollDownTimer->stop(); // always stop the scroll down timer
+    ui->remainingPaperLabel->hide();
 
     uint returnTimeout = configWidget->get_ReturnToThumbnailViewTimeout();
 
@@ -409,6 +410,8 @@ void PhotoPrint::set_View(ViewEnum e){
         {
             returnToThumbnailViewTimer->start(returnTimeout*1000);
         }
+        showRemainingPaper();
+
         break;
 
     case viewPrintActive:
@@ -956,4 +959,21 @@ void PhotoPrint::on_prevButton_clicked()
     }
 }
 
+
+void PhotoPrint::showRemainingPaper()
+{
+    QFile file("remainingPaper.txt");
+    if(file.open(QIODevice::ReadOnly))
+    {
+        QTextStream in(&file);
+        if(!in.atEnd())
+        {
+            QString line=in.readLine();
+            ui->remainingPaperLabel->setText(line);
+        }
+
+        ui->remainingPaperLabel->show();
+        file.close();
+    }
+}
 
