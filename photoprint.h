@@ -64,6 +64,7 @@ private slots:
     void on_prevButton_clicked();
 
     void thumbnailScrollDownTimer_Timeout();
+    void returnToThumbnailViewTimer_Timeout();
     void listWidget_ScrollerStateChanged(QScroller::State newState);
 
 private:
@@ -95,6 +96,9 @@ private:
 
     // Timer for automatic scroll down:
     QTimer* thumbnailScrollDownTimer;
+
+    // Timer for automatic return to ThumbnailView down:
+    QTimer* returnToThumbnailViewTimer;
 
 
 };

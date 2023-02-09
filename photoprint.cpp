@@ -14,6 +14,7 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     , watcherRestartTimer(new QTimer(this))
     , printActiveTimer(new QTimer(this))
     , thumbnailScrollDownTimer(new QTimer(this))
+    , returnToThumbnailViewTimer(new QTimer(this))
 {
     ui->setupUi(this);
 
@@ -61,6 +62,10 @@ PhotoPrint::PhotoPrint(QWidget *parent)
     // thumbnailScrollDownTimer
     thumbnailScrollDownTimer->setSingleShot(true);
     connect(thumbnailScrollDownTimer,SIGNAL(timeout()),this,SLOT(thumbnailScrollDownTimer_Timeout()));
+
+    // returnTothumbnailView Timer
+    returnToThumbnailViewTimer->setSingleShot(true);
+    connect(returnToThumbnailViewTimer,SIGNAL(timeout()),this,SLOT(returnToThumbnailViewTimer_Timeout()));
 
     // ---- config widget ----
     configWidget->setParent(this);
@@ -310,6 +315,7 @@ void PhotoPrint::set_View(ViewEnum e){
 
     thumbnailScrollDownTimer->stop(); // always stop the scroll down timer
 
+    uint returnTimeout = configWidget->get_ReturnToThumbnailViewTimeout();
 
     switch(e)
     {
@@ -371,6 +377,12 @@ void PhotoPrint::set_View(ViewEnum e){
 
         configWidget->script_setViewImage(selectedImageItem->filename); // execute the external script
 
+        //restart the return timer
+        if(returnTimeout >0)
+        {
+            returnToThumbnailViewTimer->start(returnTimeout*1000);
+        }
+
         currentView = viewImage;
         break;
     case viewCart:
@@ -384,6 +396,12 @@ void PhotoPrint::set_View(ViewEnum e){
         ui->prevButton->hide();
         printActiveViewMarker = currentView;
         currentView = viewPrintConfirmation;
+
+        //restart the return timer
+        if(returnTimeout >0)
+        {
+            returnToThumbnailViewTimer->start(returnTimeout*1000);
+        }
         break;
 
     case viewPrintActive:
@@ -835,6 +853,16 @@ void PhotoPrint::thumbnailScrollDownTimer_Timeout()
 {
     // ui was not touched until timeout. scroll down to the newest images
     ui->listWidget->scrollToBottom();
+    qInfo() << "thumbnailScrollDownTimer Timeout";
+}
+
+void PhotoPrint:: returnToThumbnailViewTimer_Timeout()
+{
+    // ui was not touched until timeout. scroll down to the newest images
+    if(currentView == viewImage || currentView == viewPrintConfirmation)
+    {
+        set_View(viewThumbnails);
+    }
     qInfo() << "thumbnailScrollDownTimer Timeout";
 }
 

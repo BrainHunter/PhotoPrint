@@ -30,6 +30,7 @@ public:
     bool get_showFullscreen();
     QSize get_ThumbnailSize();
     uint get_ThumbnailScrollDownTimeout();
+    uint get_ReturnToThumbnailViewTimeout();
 
     uint get_printActiveTimeout();
 

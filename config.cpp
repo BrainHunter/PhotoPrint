@@ -143,6 +143,11 @@ void config::loadSettings()
      {
         ui->thumbnailScrollDownTimeoutSpinBox->setValue(ThumbnailScrollDownTimeout);
      }
+     uint ReturnToThumbnailViewollTimeout = settings.value("ThumbnailView/ReturnToThumbnailViewollTimeout", "60").toUInt();
+     if (ui->returnToThumbnailViewollTimeoutSpinBox)
+     {
+        ui->returnToThumbnailViewollTimeoutSpinBox->setValue(ReturnToThumbnailViewollTimeout);
+     }
 
      // File Copy
      bool LocalCopyEnabled = settings.value("FileCopy/LocalCopyEnabled", "false").toBool();
@@ -253,6 +258,7 @@ void config::saveSettings()
      settings.beginGroup("ThumbnailView");
      settings.setValue("ThumbnailSize", ui->thumbnailSizeSpinBox->value());
      settings.setValue("ThumbnailScrollDownTimeout", (uint)ui->thumbnailScrollDownTimeoutSpinBox->value());
+     settings.setValue("ReturnToThumbnailViewollTimeout", (uint)ui->returnToThumbnailViewollTimeoutSpinBox->value());
      settings.endGroup();
 
      // File Copy
@@ -545,6 +551,10 @@ uint config::get_ThumbnailScrollDownTimeout()
     return (uint)ui->thumbnailScrollDownTimeoutSpinBox->value();
 }
 
+uint config::get_ReturnToThumbnailViewTimeout()
+{
+    return (uint)ui->returnToThumbnailViewollTimeoutSpinBox->value();
+}
 
 //// ------------------- File Copy thingies ---------------
 ///
