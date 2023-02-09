@@ -20,6 +20,7 @@ public:
     void setPrintButtonVisible(bool state);
     void setCartButtonVisible(bool state);
     bool cutHeight;
+    void setGreyedOut(bool val);
 
 private slots:
     void on_printButton_clicked();

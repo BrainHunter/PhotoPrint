@@ -126,3 +126,9 @@ void ImageView::on_cartButton_clicked()
     emit cartButton_Pressed();
 
 }
+
+void ImageView::setGreyedOut(bool val)
+{
+    imageLabel->setDisabled(val);
+
+}

@@ -377,6 +377,10 @@ void PhotoPrint::set_View(ViewEnum e){
 
         configWidget->script_setViewImage(selectedImageItem->filename); // execute the external script
 
+        imgView->setGreyedOut(false);
+        ui->printButton->setStyleSheet("background-color: rgba(255, 255, 255, 50);");
+        ui->backButton->setStyleSheet("background-color: rgba(255, 255, 255, 50);");
+
         //restart the return timer
         if(returnTimeout >0)
         {
@@ -396,6 +400,9 @@ void PhotoPrint::set_View(ViewEnum e){
         ui->prevButton->hide();
         printActiveViewMarker = currentView;
         currentView = viewPrintConfirmation;
+        imgView->setGreyedOut(true);
+        ui->printButton->setStyleSheet("background-color: rgba(255, 255, 255, 200);");
+        ui->backButton->setStyleSheet("background-color: rgba(255, 255, 255, 200);");
 
         //restart the return timer
         if(returnTimeout >0)
