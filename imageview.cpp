@@ -61,11 +61,16 @@ ImageView::~ImageView()
 
 void ImageView::resize(QSize size)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    if(!imageLabel->pixmap(Qt::ReturnByValueConstant()).isNull()) // if no image is loaded don't do this
+#else
     if(imageLabel->pixmap() != NULL) // if no image is loaded don't do this
+#endif
     {
         QSize imgSize = image.size();
         if(imgSize.width() == 0){
-            throw 1;
+            qDebug() << "rezize with image size = 0";
+            return;
         }
         QSize tempSize = size;
         if(cutHeight)

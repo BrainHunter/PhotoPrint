@@ -20,6 +20,18 @@ To build the Project you need the QT framework
 
 ## Linux
 
+
+
+``` shell
+sudo apt install qtbase5-dev qt5-qmake
+
+git clone https://github.com/BrainHunter/PhotoPrint.git
+cd PhotoPrint
+git submodule update --init --recursive
+
+```
+
+
 ```
  qmake Photobox_Widget.pro
  make

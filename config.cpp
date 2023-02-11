@@ -6,7 +6,7 @@
 #include <QPrintDialog>
 #include <QPrinterInfo>
 
-#include "QR-Code-generator\cpp\qrcodegen.hpp"
+#include "QR-Code-generator/cpp/qrcodegen.hpp"
 
 
 config::config(QWidget *parent) :
