@@ -725,8 +725,19 @@ void PhotoPrint::on_printButton_clicked()
 }
 
 void PhotoPrint::PaintPage(QPrinter* printer){
-    QImage img = selectedImageItem->getImage();
-    QPainter painter(printer);
+    QImage img = selectedImageItem->getImage().convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    QPainter printerPainter(printer);
+
+    // when painting overlays containing transparent parts directly to the printer the transparent parts affect the original image
+    // assumption is that ther is something going wron with the alpha cannel. to fix this lets try this:
+    // generate a temporary image with the same size as the printer.
+    // paint onto this image
+    // get rid of the alpha channel
+    // paint this image on the printer.
+
+    QImage tempImage = QImage(printer->pageRect().width(), printer->pageRect().height(), QImage::Format_ARGB32_Premultiplied);
+    QPainter painter(&tempImage);
+
     double xscale = printer->pageRect().width() / double(img.width());
     double yscale = printer->pageRect().height() / double(img.height());
     //double xscale = printer->paperRect().width() / double(img.width());
@@ -759,8 +770,9 @@ void PhotoPrint::PaintPage(QPrinter* printer){
     // draw overlay image:
     if(configWidget->get_OverlayEnabled())
     {
+        QImage overlayImage = configWidget->get_OverlayImage()->convertToFormat(QImage::Format_ARGB32_Premultiplied);
         PaintOverlay(&painter,
-                     configWidget->get_OverlayImage(),
+                     &overlayImage,
                      configWidget->get_OverlayDistance(),
                      configWidget->get_OverlayPosition());
     }
@@ -775,6 +787,22 @@ void PhotoPrint::PaintPage(QPrinter* printer){
     }
 
     painter.end();
+    // convert to RGB
+    tempImage = tempImage.convertToFormat(QImage::Format_RGB32);
+
+    // uncomment to display the temp image:
+    /*
+    QDialog dlg;
+    QHBoxLayout *l = new QHBoxLayout(&dlg);
+    QLabel *label = new QLabel;
+    l->addWidget(label);
+    label->setPixmap(QPixmap::fromImage(tempImage));
+    dlg.exec();
+    */
+
+    // now the image can be printed:
+    printerPainter.drawImage(QPoint(0,0),tempImage);
+    printerPainter.end();
 }
 
 
